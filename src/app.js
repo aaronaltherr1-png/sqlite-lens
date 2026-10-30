@@ -12,15 +12,20 @@ class SQLiteLensStudio {
     this.erdViewer = null;
     this.paletteIndex = 0;
     this.paletteActions = [];
+    this.inWorkbench = false;
 
     this.initDOMElements();
     this.bindEvents();
     this.initTheme();
-    this.bootstrapApp();
   }
 
   initDOMElements() {
-    // Window Header & Status Elements
+    // Screen Views
+    this.launcherView = document.getElementById('launcher-view');
+    this.workbenchView = document.getElementById('workbench-view');
+
+    // Titlebar Elements
+    this.brandHomeBtn = document.getElementById('brand-home-btn');
     this.activeDbPill = document.getElementById('active-db-pill');
     this.activeDbName = document.getElementById('active-db-name');
     this.activeDbSize = document.getElementById('active-db-size');
@@ -33,7 +38,15 @@ class SQLiteLensStudio {
     // Drag overlay
     this.dragOverlay = document.getElementById('drag-overlay');
 
-    // Sidebar
+    // Launcher Triggers
+    this.launcherDropzone = document.getElementById('launcher-dropzone');
+    this.launchSaas = document.getElementById('launch-saas');
+    this.launchEcom = document.getElementById('launch-ecom');
+    this.launchBlank = document.getElementById('launch-blank');
+
+    // Workbench Navigation
+    this.btnReturnLauncher = document.getElementById('btn-return-launcher');
+    this.btnSidebarHome = document.getElementById('btn-sidebar-home');
     this.connSaas = document.getElementById('conn-saas');
     this.connEcom = document.getElementById('conn-ecom');
     this.sidebarFilterInput = document.getElementById('sidebar-filter-input');
@@ -110,6 +123,21 @@ class SQLiteLensStudio {
   }
 
   bindEvents() {
+    // Return to start page
+    this.brandHomeBtn.addEventListener('click', () => this.showStartPage());
+    this.btnReturnLauncher.addEventListener('click', () => this.showStartPage());
+    this.btnSidebarHome.addEventListener('click', () => this.showStartPage());
+
+    // Launcher Triggers
+    this.launcherDropzone.addEventListener('click', () => this.filePickerInput.click());
+    this.launchSaas.addEventListener('click', () => {
+      this.switchWorkspace('saas-production.db', 'saas-production.db', this.connSaas);
+    });
+    this.launchEcom.addEventListener('click', () => {
+      this.switchWorkspace('ecommerce-store.db', 'ecommerce-store.db', this.connEcom);
+    });
+    this.launchBlank.addEventListener('click', () => this.createBlankDatabase());
+
     // Mode Switcher Tabs
     this.modeTabs.forEach(tab => {
       tab.addEventListener('click', () => {
@@ -117,7 +145,7 @@ class SQLiteLensStudio {
       });
     });
 
-    // Workspace Connection Switchers
+    // Workspace Connection Switchers (Sidebar)
     this.connSaas.addEventListener('click', () => {
       this.switchWorkspace('saas-production.db', 'saas-production.db', this.connSaas);
     });
@@ -255,7 +283,7 @@ class SQLiteLensStudio {
       this.showToast('Copied to clipboard', 'success');
     });
 
-    // Keyboard Shortcuts (Ctrl+K, Esc)
+    // Global Keyboard Shortcuts (Ctrl+K, Esc)
     window.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
@@ -281,19 +309,47 @@ class SQLiteLensStudio {
     });
   }
 
-  async bootstrapApp() {
-    // Immediately boot into full software studio with SaaS production cluster
+  showStartPage() {
+    this.inWorkbench = false;
+    this.launcherView.style.display = 'flex';
+    this.workbenchView.classList.remove('active');
+    this.activeDbName.textContent = 'Start Page';
+    this.activeDbSize.textContent = 'Launcher';
+    this.btnExportDump.style.display = 'none';
+  }
+
+  enterWorkbench() {
+    this.inWorkbench = true;
+    this.launcherView.style.display = 'none';
+    this.workbenchView.classList.add('active');
+    this.btnExportDump.style.display = 'inline-flex';
+  }
+
+  async createBlankDatabase() {
     try {
-      this.showToast('Connecting to in-memory SQLite WASM cluster...', 'info');
-      await this.switchWorkspace('saas-production.db', 'saas-production.db', this.connSaas);
-    } catch (err) {
-      console.error(err);
-      this.showToast(`Initialization note: ${err.message}`, 'error');
+      await dbEngine.initWasm();
+      dbEngine.db = new dbEngine.SQL.Database();
+      dbEngine.dbName = 'scratchpad.db';
+      dbEngine.dbSize = 4096;
+      dbEngine.db.run(`
+        CREATE TABLE demo_items (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+        INSERT INTO demo_items (name) VALUES ('Welcome to SQLiteLens Studio'), ('Type queries in SQL Studio');
+      `);
+      const summary = dbEngine.getDatabaseSummary();
+      this.onDatabaseLoaded(summary);
+      this.showToast('Created In-Memory Scratchpad Database', 'success');
+    } catch (e) {
+      this.showToast(`Error: ${e.message}`, 'error');
     }
   }
 
   async switchWorkspace(dbUrl, displayName, activeBtn) {
     try {
+      this.showToast(`Mounting ${displayName}...`, 'info');
       document.querySelectorAll('.connection-item').forEach(c => c.classList.remove('active'));
       if (activeBtn) activeBtn.classList.add('active');
 
@@ -321,6 +377,8 @@ class SQLiteLensStudio {
   }
 
   onDatabaseLoaded(summary) {
+    this.enterWorkbench();
+
     this.activeDbName.textContent = summary.name;
     this.activeDbSize.textContent = summary.formattedSize;
     this.sbDbInfo.textContent = `Database: ${summary.name} (${summary.formattedSize})`;
@@ -432,7 +490,6 @@ class SQLiteLensStudio {
     this.activeTableMetaText.textContent = `${this.activeTable} • ${res.totalCount} rows • ${res.executionTimeMs}ms`;
     this.sbPerfTime.textContent = `Latency: ${res.executionTimeMs}ms`;
 
-    // Headers
     let thead = '<tr><th class="row-num-cell">#</th>';
     res.columnMeta.forEach(col => {
       let icon = '';
@@ -456,7 +513,6 @@ class SQLiteLensStudio {
     thead += '</tr>';
     this.mainTableHead.innerHTML = thead;
 
-    // Header sort events
     this.mainTableHead.querySelectorAll('th[data-column]').forEach(th => {
       th.addEventListener('click', () => {
         const col = th.dataset.column;
@@ -470,7 +526,6 @@ class SQLiteLensStudio {
       });
     });
 
-    // Rows
     if (!res.rows.length) {
       this.mainTableBody.innerHTML = `
         <tr>
@@ -510,7 +565,6 @@ class SQLiteLensStudio {
       });
     }
 
-    // Pagination
     const startNum = res.totalCount === 0 ? 0 : (res.page - 1) * res.pageSize + 1;
     const endNum = Math.min(res.page * res.pageSize, res.totalCount);
     this.gridPaginationLabel.textContent = `Showing rows ${startNum}-${endNum} of ${res.totalCount}`;
@@ -671,11 +725,11 @@ class SQLiteLensStudio {
     }
   }
 
-  /* Command Palette Omnibar (Ctrl+K) */
   buildPaletteActions(tables) {
     this.paletteActions = [
-      { type: 'command', title: 'Switch to SaaS Production Database', action: () => this.switchWorkspace('saas-production.db', 'saas-production.db', this.connSaas) },
-      { type: 'command', title: 'Switch to E-Commerce Cloud Database', action: () => this.switchWorkspace('ecommerce-store.db', 'ecommerce-store.db', this.connEcom) },
+      { type: 'command', title: 'Return to Start Page', action: () => this.showStartPage() },
+      { type: 'command', title: 'Launch SaaS Production Database', action: () => this.switchWorkspace('saas-production.db', 'saas-production.db', this.connSaas) },
+      { type: 'command', title: 'Launch E-Commerce Cloud Database', action: () => this.switchWorkspace('ecommerce-store.db', 'ecommerce-store.db', this.connEcom) },
       { type: 'command', title: 'Export Full Database SQL Dump', action: () => this.btnExportDump.click() },
       { type: 'command', title: 'Open SQL Studio Console', action: () => this.switchMode('query') },
       { type: 'command', title: 'Open Interactive Visual ERD', action: () => this.switchMode('erd') },

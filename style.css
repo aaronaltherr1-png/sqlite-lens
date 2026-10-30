@@ -9,7 +9,7 @@
   --bg-surface: #101624;
   --bg-elevated: #151d30;
   --bg-elevated-hover: #1b2640;
-  --bg-card: rgba(18, 25, 42, 0.8);
+  --bg-card: rgba(18, 25, 42, 0.85);
   
   --border-subtle: rgba(255, 255, 255, 0.07);
   --border-medium: rgba(255, 255, 255, 0.12);
@@ -55,7 +55,7 @@
   --bg-surface: #ffffff;
   --bg-elevated: #e2e8f0;
   --bg-elevated-hover: #cbd5e1;
-  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-card: rgba(255, 255, 255, 0.95);
 
   --border-subtle: rgba(0, 0, 0, 0.08);
   --border-medium: rgba(0, 0, 0, 0.14);
@@ -108,18 +108,18 @@ html, body {
   background: var(--text-muted);
 }
 
-/* ==========================================================================
-   Window Frame & Top Navigation
-   ========================================================================== */
 .window-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 100vw;
   overflow: hidden;
+  position: relative;
 }
 
-/* Top Window Titlebar (macOS Style Desktop Header) */
+/* ==========================================================================
+   Window Frame & Top Navigation
+   ========================================================================== */
 .titlebar {
   height: 48px;
   background: var(--bg-sidebar);
@@ -165,6 +165,7 @@ html, body {
   letter-spacing: -0.01em;
   color: var(--text-primary);
   text-decoration: none;
+  cursor: pointer;
 }
 
 .brand-icon {
@@ -251,8 +252,263 @@ html, body {
 }
 
 /* ==========================================================================
-   Software Sub-Header: Mode View Tabs
+   LAUNCHER / START SCREEN (The Pro Software Splash View)
    ========================================================================== */
+.launcher-view {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px 60px;
+  background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.12), transparent 60%);
+  position: relative;
+}
+
+.launcher-hero {
+  text-align: center;
+  max-width: 760px;
+  margin-bottom: 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.launcher-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: var(--accent-cyan);
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.775rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.launcher-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  background: linear-gradient(180deg, #ffffff 40%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-theme="light"] .launcher-title {
+  background: linear-gradient(180deg, #0f172a 40%, #475569 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.launcher-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 620px;
+}
+
+/* Launcher Content Grid */
+.launcher-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 24px;
+  max-width: 980px;
+  width: 100%;
+  margin-bottom: 32px;
+}
+
+/* Launcher Dropzone Card */
+.launcher-dropzone-card {
+  background: var(--bg-surface);
+  border: 2px dashed var(--border-medium);
+  border-radius: var(--radius-xl);
+  padding: 36px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-md);
+}
+
+.launcher-dropzone-card:hover, .launcher-dropzone-card.drag-active {
+  border-color: var(--primary);
+  background: var(--bg-elevated);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow), var(--shadow-lg);
+}
+
+.dropzone-icon-box {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+}
+
+.dropzone-head {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dropzone-desc {
+  font-size: 0.825rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.dropzone-security-pill {
+  font-size: 0.72rem;
+  color: var(--accent-emerald);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  padding: 3px 10px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Launcher Workspaces List */
+.launcher-workspaces-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--shadow-md);
+}
+
+.workspace-card-title {
+  font-size: 0.725rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.launcher-sample-item {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.launcher-sample-item:hover {
+  border-color: var(--border-focus);
+  background: var(--bg-elevated-hover);
+  transform: translateX(3px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.sample-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sample-item-name {
+  font-size: 0.925rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sample-item-desc {
+  font-size: 0.775rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.sample-item-tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.sample-pill {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--accent-cyan);
+}
+
+/* Launcher Features Showcase */
+.launcher-features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 980px;
+  width: 100%;
+}
+
+.feature-tile {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feature-tile-icon {
+  font-size: 1.25rem;
+}
+
+.feature-tile-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.feature-tile-desc {
+  font-size: 0.775rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+/* ==========================================================================
+   WORKBENCH SCREEN (The Full Software Studio)
+   ========================================================================== */
+.workbench-view {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+.workbench-view.active {
+  display: flex;
+}
+
+/* Sub-Header: Mode View Tabs */
 .studio-tabs-bar {
   height: 42px;
   background: var(--bg-surface);
@@ -304,9 +560,7 @@ html, body {
   gap: 8px;
 }
 
-/* ==========================================================================
-   Buttons & Inputs
-   ========================================================================== */
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -377,9 +631,7 @@ html, body {
   border-color: var(--primary);
 }
 
-/* ==========================================================================
-   Main Studio Layout
-   ========================================================================== */
+/* Studio Body: Sidebar & Viewport */
 .studio-body {
   display: flex;
   flex: 1;
@@ -387,7 +639,6 @@ html, body {
   overflow: hidden;
 }
 
-/* Left Professional Sidebar */
 .studio-sidebar {
   width: 280px;
   min-width: 280px;
@@ -496,9 +747,7 @@ html, body {
   border: 1px solid var(--border-subtle);
 }
 
-/* ==========================================================================
-   Central Content Panels
-   ========================================================================== */
+/* Studio Content Panels */
 .studio-content {
   flex: 1;
   display: flex;
@@ -519,7 +768,7 @@ html, body {
   display: flex;
 }
 
-/* --- Panel 1: Table & Data Grid --- */
+/* Grid View */
 .grid-toolbar {
   height: 44px;
   background: var(--bg-surface);
@@ -629,7 +878,6 @@ html, body {
   font-size: 0.7rem;
 }
 
-/* Pagination Bar */
 .grid-pagination-bar {
   height: 38px;
   background: var(--bg-surface);
@@ -642,7 +890,7 @@ html, body {
   color: var(--text-secondary);
 }
 
-/* --- Panel 2: SQL Query Studio --- */
+/* SQL Studio View */
 .query-workspace {
   display: flex;
   flex-direction: column;
@@ -723,7 +971,7 @@ html, body {
   position: relative;
 }
 
-/* --- Panel 3: Visual Schema ERD Canvas --- */
+/* ERD Canvas View */
 .erd-studio-canvas {
   flex: 1;
   position: relative;
@@ -825,7 +1073,7 @@ html, body {
   font-size: 0.68rem;
 }
 
-/* --- Panel 4: Insights & Diagnostics --- */
+/* Insights View */
 .insights-scroll-area {
   flex: 1;
   overflow-y: auto;
@@ -935,9 +1183,7 @@ html, body {
   text-align: right;
 }
 
-/* ==========================================================================
-   Bottom Status Bar (Desktop Style)
-   ========================================================================== */
+/* Bottom Status Bar */
 .studio-statusbar {
   height: 26px;
   background: var(--bg-sidebar);
@@ -963,9 +1209,7 @@ html, body {
   gap: 5px;
 }
 
-/* ==========================================================================
-   Command Palette Modal (Raycast / Spotlight style)
-   ========================================================================== */
+/* Command Palette Modal */
 .palette-overlay {
   position: fixed;
   inset: 0;
@@ -977,9 +1221,7 @@ html, body {
   padding-top: 15vh;
   z-index: 500;
 }
-.palette-overlay.active {
-  display: flex;
-}
+.palette-overlay.active { display: flex; }
 
 .palette-box {
   background: var(--bg-surface);
@@ -1036,7 +1278,7 @@ html, body {
   color: #ffffff;
 }
 
-/* Cell Inspector Modal */
+/* Modal Cell Inspector */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -1089,7 +1331,7 @@ html, body {
   gap: 8px;
 }
 
-/* Toast Notifications */
+/* Toast Shelf */
 .toast-shelf {
   position: fixed;
   bottom: 38px;
@@ -1116,11 +1358,11 @@ html, body {
   pointer-events: auto;
 }
 
-/* Drag overlay on window */
+/* Fullscreen Drag Overlay */
 .drag-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(99, 102, 241, 0.85);
+  background: rgba(99, 102, 241, 0.88);
   backdrop-filter: blur(12px);
   z-index: 1000;
   display: none;
@@ -1131,9 +1373,7 @@ html, body {
   color: #ffffff;
   pointer-events: none;
 }
-.drag-overlay.active {
-  display: flex;
-}
+.drag-overlay.active { display: flex; }
 
 @keyframes palettePop {
   from { opacity: 0; transform: translateY(-10px) scale(0.98); }
@@ -1143,4 +1383,12 @@ html, body {
 @keyframes toastIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 900px) {
+  .launcher-grid { grid-template-columns: 1fr; }
+  .launcher-features-grid { grid-template-columns: 1fr; }
+  .studio-sidebar { width: 220px; min-width: 220px; }
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .insights-split { grid-template-columns: 1fr; }
 }

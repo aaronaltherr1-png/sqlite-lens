@@ -19,7 +19,7 @@
 </head>
 <body>
 
-  <!-- Drag & Drop Fullscreen Overlay -->
+  <!-- Fullscreen Drag & Drop Overlay -->
   <div id="drag-overlay" class="drag-overlay">
     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -42,7 +42,7 @@
           <span class="window-dot dot-maximize"></span>
         </div>
 
-        <a href="#" class="brand-badge">
+        <div class="brand-badge" id="brand-home-btn" title="Go to Start Page">
           <div class="brand-icon">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
@@ -52,15 +52,15 @@
           </div>
           <span>SQLiteLens</span>
           <span style="font-size: 0.65rem; padding: 2px 5px; border-radius: 4px; background: rgba(99,102,241,0.2); color: var(--accent-cyan); font-weight: 700;">STUDIO PRO</span>
-        </a>
+        </div>
 
         <div class="titlebar-divider"></div>
 
         <!-- Active Database Cluster Pill -->
         <div class="cluster-pill" id="active-db-pill">
           <span class="cluster-dot"></span>
-          <span id="active-db-name" style="font-weight: 600; color: var(--text-primary);">saas-production.db</span>
-          <span id="active-db-size" style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted);">61 KB</span>
+          <span id="active-db-name" style="font-weight: 600; color: var(--text-primary);">Start Page</span>
+          <span id="active-db-size" style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted);">Launcher</span>
         </div>
       </div>
 
@@ -91,7 +91,7 @@
           Open File
         </button>
 
-        <button id="btn-export-dump" class="btn btn-secondary btn-sm" title="Export full SQL schema and data dump">
+        <button id="btn-export-dump" class="btn btn-secondary btn-sm" style="display: none;" title="Export full SQL schema and data dump">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="7 10 12 15 17 10"></polyline>
@@ -127,283 +127,409 @@
       </div>
     </header>
 
-    <!-- Studio Mode Tabs Bar -->
-    <nav class="studio-tabs-bar">
-      <div class="mode-tabs-list">
-        <button class="mode-tab-btn active" data-tab="grid" id="mode-tab-grid">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="3" y1="9" x2="21" y2="9"></line>
-            <line x1="9" y1="21" x2="9" y2="9"></line>
-          </svg>
-          <span>Data Grid</span>
-        </button>
-
-        <button class="mode-tab-btn" data-tab="query" id="mode-tab-query">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-          </svg>
-          <span>SQL Studio</span>
-        </button>
-
-        <button class="mode-tab-btn" data-tab="erd" id="mode-tab-erd">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="18" cy="5" r="3"></circle>
-            <circle cx="6" cy="12" r="3"></circle>
-            <circle cx="18" cy="19" r="3"></circle>
-            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-          </svg>
-          <span>Interactive ERD</span>
-        </button>
-
-        <button class="mode-tab-btn" data-tab="insights" id="mode-tab-insights">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="20" x2="18" y2="10"></line>
-            <line x1="12" y1="20" x2="12" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="14"></line>
-          </svg>
-          <span>Insights & Health</span>
-        </button>
+    <!-- =======================================================================
+         VIEW 1: START PAGE / STUDIO LAUNCHER (The Pro Software Splash Hub)
+         ======================================================================= -->
+    <main id="launcher-view" class="launcher-view">
+      <div class="launcher-hero">
+        <div class="launcher-badge">
+          <span>✨</span>
+          <span>DESKTOP WORKBENCH • PRO EDITION</span>
+        </div>
+        <h1 class="launcher-title">
+          Modern, Private SQLite Studio in Your Browser.
+        </h1>
+        <p class="launcher-subtitle">
+          Inspect schemas, generate interactive visual ERDs, write queries with execution timers, and export data. 
+          100% in-memory WebAssembly engine. Zero cloud telemetry.
+        </p>
       </div>
 
-      <div class="studio-actions-right">
-        <span id="active-table-meta-text" style="font-size: 0.775rem; color: var(--text-muted); font-family: var(--font-mono);">Ready</span>
-      </div>
-    </nav>
-
-    <!-- Studio Body: Sidebar & Content Viewports -->
-    <div class="studio-body">
-      
-      <!-- Left Workbench Sidebar -->
-      <aside class="studio-sidebar">
-        <!-- Workspaces Section -->
-        <div class="sidebar-connections">
-          <div class="sidebar-title">
-            <span>Workspaces</span>
-            <span style="font-size: 0.65rem; color: var(--accent-cyan);">ACTIVE</span>
-          </div>
-          
-          <div class="connection-item active" id="conn-saas">
-            <div class="connection-name">
-              <span>⚡</span>
-              <span>SaaS Production DB</span>
-            </div>
-            <span style="font-size: 0.7rem; color: var(--text-muted);">6 tables</span>
-          </div>
-
-          <div class="connection-item" id="conn-ecom">
-            <div class="connection-name">
-              <span>🛒</span>
-              <span>E-Commerce Cloud</span>
-            </div>
-            <span style="font-size: 0.7rem; color: var(--text-muted);">5 tables</span>
-          </div>
-        </div>
-
-        <!-- Schema Table Tree -->
-        <div class="sidebar-tree-container">
-          <div>
-            <div class="sidebar-title">
-              <span>Tables & Entities</span>
-              <span id="sidebar-tables-count">0</span>
-            </div>
-            <input type="text" id="sidebar-filter-input" class="input-search" placeholder="Filter tables (Ctrl+K)..." style="width: 100%; margin-bottom: 8px;">
-            <ul class="table-list" id="sidebar-tables-list">
-              <!-- Dynamically populated tables -->
-            </ul>
-          </div>
-
-          <div id="sidebar-views-block" style="display: none;">
-            <div class="sidebar-title">
-              <span>Views</span>
-              <span id="sidebar-views-count">0</span>
-            </div>
-            <ul class="table-list" id="sidebar-views-list"></ul>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Central View Content -->
-      <main class="studio-content">
+      <!-- Launcher Grid: Dropzone & Workspaces -->
+      <div class="launcher-grid">
         
-        <!-- ========================================================
-             View 1: Data Grid
-             ======================================================== -->
-        <section id="panel-grid" class="view-panel active">
-          <div class="grid-toolbar">
-            <div class="grid-toolbar-left">
-              <span class="table-header-title" id="grid-table-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="3" y1="9" x2="21" y2="9"></line>
-                  <line x1="9" y1="21" x2="9" y2="9"></line>
-                </svg>
-                <span id="grid-active-table-name">table_name</span>
-              </span>
-              <span id="grid-row-count-badge" class="table-badge-rows">0 rows</span>
+        <!-- Left: Dropzone Card -->
+        <div class="launcher-dropzone-card" id="launcher-dropzone">
+          <div class="dropzone-icon-box">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <div>
+            <div class="dropzone-head">Mount Local Database</div>
+            <div class="dropzone-desc">Drop any .db, .sqlite, or .sqlite3 file here, or click to browse files on your computer.</div>
+          </div>
+          <div class="dropzone-security-pill">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>100% In-Memory Sandbox • No Server Uploads</span>
+          </div>
+        </div>
+
+        <!-- Right: Sample Workspaces -->
+        <div class="launcher-workspaces-card">
+          <div class="workspace-card-title">
+            <span>Instant Workspaces</span>
+            <span style="color: var(--accent-cyan); font-size: 0.68rem;">1-CLICK DEMO</span>
+          </div>
+
+          <!-- Workspace A -->
+          <div class="launcher-sample-item" id="launch-saas">
+            <div class="sample-item-info">
+              <div class="sample-item-name">
+                <span>⚡</span>
+                <span>SaaS Cloud Production Cluster</span>
+              </div>
+              <div class="sample-item-desc">
+                Organizations, user roles, active subscriptions, API keys, invoices, and audit telemetry.
+              </div>
+              <div class="sample-item-tags">
+                <span class="sample-pill">6 tables</span>
+                <span class="sample-pill">1,420 rows</span>
+                <span class="sample-pill">Foreign Keys</span>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm">Launch →</button>
+          </div>
+
+          <!-- Workspace B -->
+          <div class="launcher-sample-item" id="launch-ecom">
+            <div class="sample-item-info">
+              <div class="sample-item-name">
+                <span>🛒</span>
+                <span>Global E-Commerce Store</span>
+              </div>
+              <div class="sample-item-desc">
+                Product catalog, customer lifetime values, order fulfillment, and relational categories.
+              </div>
+              <div class="sample-item-tags">
+                <span class="sample-pill">5 tables</span>
+                <span class="sample-pill">850 rows</span>
+                <span class="sample-pill">Relational ERD</span>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-sm">Launch →</button>
+          </div>
+
+          <!-- Workspace C: Scratchpad -->
+          <div class="launcher-sample-item" id="launch-blank">
+            <div class="sample-item-info">
+              <div class="sample-item-name">
+                <span>📝</span>
+                <span>In-Memory Scratchpad DB</span>
+              </div>
+              <div class="sample-item-desc">
+                Empty sandbox database to create tables and run scratchpad queries.
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Create →</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Launcher Features Showcase -->
+      <div class="launcher-features-grid">
+        <div class="feature-tile">
+          <div class="feature-tile-icon">🕸️</div>
+          <div class="feature-tile-title">Interactive Visual ERD</div>
+          <div class="feature-tile-desc">Automatic schema graph with draggable table cards and dynamic SVG Bézier relation lines.</div>
+        </div>
+
+        <div class="feature-tile">
+          <div class="feature-tile-icon">⚡</div>
+          <div class="feature-tile-title">Sub-Millisecond SQL Studio</div>
+          <div class="feature-tile-desc">Full query editor with keyboard execution (Ctrl+Enter), EXPLAIN bytecode analysis, and timers.</div>
+        </div>
+
+        <div class="feature-tile">
+          <div class="feature-tile-icon">⌨️</div>
+          <div class="feature-tile-title">Command Palette (Ctrl+K)</div>
+          <div class="feature-tile-desc">Raycast-style spotlight search to jump to tables, run commands, or toggle modes instantly.</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- =======================================================================
+         VIEW 2: WORKBENCH (The Full Desktop Software Studio)
+         ======================================================================= -->
+    <div id="workbench-view" class="workbench-view">
+      
+      <!-- Studio Mode Tabs Bar -->
+      <nav class="studio-tabs-bar">
+        <div class="mode-tabs-list">
+          <button class="mode-tab-btn active" data-tab="grid" id="mode-tab-grid">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+            <span>Data Grid</span>
+          </button>
+
+          <button class="mode-tab-btn" data-tab="query" id="mode-tab-query">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span>SQL Studio</span>
+          </button>
+
+          <button class="mode-tab-btn" data-tab="erd" id="mode-tab-erd">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            </svg>
+            <span>Interactive ERD</span>
+          </button>
+
+          <button class="mode-tab-btn" data-tab="insights" id="mode-tab-insights">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span>Insights & Health</span>
+          </button>
+        </div>
+
+        <div class="studio-actions-right">
+          <button id="btn-return-launcher" class="btn btn-ghost btn-sm" title="Return to Start Page">
+            ← Start Page
+          </button>
+          <span id="active-table-meta-text" style="font-size: 0.775rem; color: var(--text-muted); font-family: var(--font-mono);">Ready</span>
+        </div>
+      </nav>
+
+      <!-- Studio Body: Sidebar & Content Viewports -->
+      <div class="studio-body">
+        
+        <!-- Left Workbench Sidebar -->
+        <aside class="studio-sidebar">
+          <div class="sidebar-connections">
+            <div class="sidebar-title">
+              <span>Workspaces</span>
+              <button id="btn-sidebar-home" class="btn btn-ghost btn-sm" style="padding: 1px 6px; font-size: 0.65rem;">Home</button>
+            </div>
+            
+            <div class="connection-item active" id="conn-saas">
+              <div class="connection-name">
+                <span>⚡</span>
+                <span>SaaS Production DB</span>
+              </div>
+              <span style="font-size: 0.7rem; color: var(--text-muted);">6 tables</span>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <input type="text" id="grid-search-filter" class="input-search" placeholder="Filter rows in realtime..." style="width: 200px;">
-              <button id="btn-grid-export-csv" class="btn btn-secondary btn-sm" title="Export table to CSV">CSV</button>
-              <button id="btn-grid-export-json" class="btn btn-secondary btn-sm" title="Export table to JSON">JSON</button>
-              <button id="btn-grid-refresh" class="btn btn-ghost btn-sm" title="Reload Table">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M23 4v6h-6"></path>
-                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-                </svg>
-              </button>
+            <div class="connection-item" id="conn-ecom">
+              <div class="connection-name">
+                <span>🛒</span>
+                <span>E-Commerce Cloud</span>
+              </div>
+              <span style="font-size: 0.7rem; color: var(--text-muted);">5 tables</span>
             </div>
           </div>
 
-          <div class="grid-viewport" id="grid-viewport">
-            <table class="data-table" id="main-data-table">
-              <thead id="main-table-head"></thead>
-              <tbody id="main-table-body"></tbody>
-            </table>
-          </div>
-
-          <div class="grid-pagination-bar">
-            <div id="grid-pagination-label">Showing rows 1-50</div>
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <button id="btn-grid-prev" class="btn btn-secondary btn-sm">Prev</button>
-              <span id="grid-pagination-page" style="font-weight: 600; padding: 0 6px;">1 / 1</span>
-              <button id="btn-grid-next" class="btn btn-secondary btn-sm">Next</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- ========================================================
-             View 2: SQL Studio
-             ======================================================== -->
-        <section id="panel-query" class="view-panel">
-          <div class="query-workspace">
-            <div class="query-editor-card">
-              <div class="query-editor-header">
-                <div class="query-quick-templates" id="query-quick-templates">
-                  <span style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700;">SNIPPETS:</span>
-                </div>
-                <div style="display: flex; gap: 6px;">
-                  <button id="btn-query-explain" class="btn btn-secondary btn-sm">Explain Plan</button>
-                  <button id="btn-query-run" class="btn btn-primary btn-sm">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                      <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                    </svg>
-                    Run Query (Ctrl+Enter)
-                  </button>
-                </div>
+          <!-- Schema Table Tree -->
+          <div class="sidebar-tree-container">
+            <div>
+              <div class="sidebar-title">
+                <span>Tables & Entities</span>
+                <span id="sidebar-tables-count">0</span>
               </div>
-              <textarea id="sql-editor-input" class="query-textarea" spellcheck="false" placeholder="Write your SQL query..."></textarea>
+              <input type="text" id="sidebar-filter-input" class="input-search" placeholder="Filter tables (Ctrl+K)..." style="width: 100%; margin-bottom: 8px;">
+              <ul class="table-list" id="sidebar-tables-list"></ul>
             </div>
 
-            <div class="query-metrics-bar">
-              <div id="query-execution-status" style="color: var(--accent-emerald); font-family: var(--font-mono);">
-                Console Ready
+            <div id="sidebar-views-block" style="display: none;">
+              <div class="sidebar-title">
+                <span>Views</span>
+                <span id="sidebar-views-count">0</span>
               </div>
-              <button id="btn-query-export-csv" class="btn btn-ghost btn-sm" style="display: none;">Export Results CSV</button>
-            </div>
-
-            <div class="query-results-viewport" id="query-results-viewport">
-              <table class="data-table" id="query-output-table">
-                <thead id="query-output-head"></thead>
-                <tbody id="query-output-body"></tbody>
-              </table>
+              <ul class="table-list" id="sidebar-views-list"></ul>
             </div>
           </div>
-        </section>
+        </aside>
 
-        <!-- ========================================================
-             View 3: Interactive Visual ERD
-             ======================================================== -->
-        <section id="panel-erd" class="view-panel">
-          <div class="erd-studio-canvas" id="erd-studio-canvas">
-            <div class="erd-floating-toolbar">
-              <button id="btn-erd-auto-layout" class="btn btn-secondary btn-sm">Auto Layout</button>
-              <button id="btn-erd-zoom-in" class="btn btn-secondary btn-sm">+</button>
-              <button id="btn-erd-zoom-out" class="btn btn-secondary btn-sm">-</button>
-            </div>
-            <div class="erd-canvas-viewport" id="erd-canvas-viewport">
-              <svg class="erd-svg-layer" id="erd-svg-layer"></svg>
-              <div id="erd-nodes-container"></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ========================================================
-             View 4: Insights & Diagnostics
-             ======================================================== -->
-        <section id="panel-insights" class="view-panel">
-          <div class="insights-scroll-area">
-            <div class="kpi-row">
-              <div class="kpi-box">
-                <div class="kpi-label">Storage Allocated</div>
-                <div class="kpi-number" id="kpi-storage">0 KB</div>
-              </div>
-              <div class="kpi-box">
-                <div class="kpi-label">Active Tables</div>
-                <div class="kpi-number" id="kpi-tables">0</div>
-              </div>
-              <div class="kpi-box">
-                <div class="kpi-label">Total Rows</div>
-                <div class="kpi-number" id="kpi-rows">0</div>
-              </div>
-              <div class="kpi-box">
-                <div class="kpi-label">Indices & Constraints</div>
-                <div class="kpi-number" id="kpi-indices">0</div>
-              </div>
-            </div>
-
-            <div class="insights-split">
-              <div class="insights-widget">
-                <div class="widget-title">
+        <!-- Central View Content -->
+        <main class="studio-content">
+          
+          <!-- View 1: Data Grid -->
+          <section id="panel-grid" class="view-panel active">
+            <div class="grid-toolbar">
+              <div class="grid-toolbar-left">
+                <span class="table-header-title" id="grid-table-title">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="20" x2="18" y2="10"></line>
-                    <line x1="12" y1="20" x2="12" y2="4"></line>
-                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                    <line x1="9" y1="21" x2="9" y2="9"></line>
                   </svg>
-                  Table Volume Distribution
-                </div>
-                <div id="insights-bar-chart" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                  <span id="grid-active-table-name">table_name</span>
+                </span>
+                <span id="grid-row-count-badge" class="table-badge-rows">0 rows</span>
               </div>
 
-              <div class="insights-widget">
-                <div class="widget-title">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="text" id="grid-search-filter" class="input-search" placeholder="Filter rows in realtime..." style="width: 200px;">
+                <button id="btn-grid-export-csv" class="btn btn-secondary btn-sm" title="Export table to CSV">CSV</button>
+                <button id="btn-grid-export-json" class="btn btn-secondary btn-sm" title="Export table to JSON">JSON</button>
+                <button id="btn-grid-refresh" class="btn btn-ghost btn-sm" title="Reload Table">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 4v6h-6"></path>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
                   </svg>
-                  Engine Telemetry & Pragmas
-                </div>
-                <table class="kv-table" id="insights-pragma-kv"></table>
-                <button id="btn-run-integrity-check" class="btn btn-secondary btn-sm" style="margin-top: 10px;">
-                  Execute PRAGMA integrity_check
                 </button>
               </div>
             </div>
-          </div>
-        </section>
 
-      </main>
+            <div class="grid-viewport" id="grid-viewport">
+              <table class="data-table" id="main-data-table">
+                <thead id="main-table-head"></thead>
+                <tbody id="main-table-body"></tbody>
+              </table>
+            </div>
+
+            <div class="grid-pagination-bar">
+              <div id="grid-pagination-label">Showing rows 1-50</div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <button id="btn-grid-prev" class="btn btn-secondary btn-sm">Prev</button>
+                <span id="grid-pagination-page" style="font-weight: 600; padding: 0 6px;">1 / 1</span>
+                <button id="btn-grid-next" class="btn btn-secondary btn-sm">Next</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- View 2: SQL Studio -->
+          <section id="panel-query" class="view-panel">
+            <div class="query-workspace">
+              <div class="query-editor-card">
+                <div class="query-editor-header">
+                  <div class="query-quick-templates" id="query-quick-templates">
+                    <span style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700;">SNIPPETS:</span>
+                  </div>
+                  <div style="display: flex; gap: 6px;">
+                    <button id="btn-query-explain" class="btn btn-secondary btn-sm">Explain Plan</button>
+                    <button id="btn-query-run" class="btn btn-primary btn-sm">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                      </svg>
+                      Run Query (Ctrl+Enter)
+                    </button>
+                  </div>
+                </div>
+                <textarea id="sql-editor-input" class="query-textarea" spellcheck="false" placeholder="Write your SQL query..."></textarea>
+              </div>
+
+              <div class="query-metrics-bar">
+                <div id="query-execution-status" style="color: var(--accent-emerald); font-family: var(--font-mono);">
+                  Console Ready
+                </div>
+                <button id="btn-query-export-csv" class="btn btn-ghost btn-sm" style="display: none;">Export Results CSV</button>
+              </div>
+
+              <div class="query-results-viewport" id="query-results-viewport">
+                <table class="data-table" id="query-output-table">
+                  <thead id="query-output-head"></thead>
+                  <tbody id="query-output-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- View 3: Interactive Visual ERD -->
+          <section id="panel-erd" class="view-panel">
+            <div class="erd-studio-canvas" id="erd-studio-canvas">
+              <div class="erd-floating-toolbar">
+                <button id="btn-erd-auto-layout" class="btn btn-secondary btn-sm">Auto Layout</button>
+                <button id="btn-erd-zoom-in" class="btn btn-secondary btn-sm">+</button>
+                <button id="btn-erd-zoom-out" class="btn btn-secondary btn-sm">-</button>
+              </div>
+              <div class="erd-canvas-viewport" id="erd-canvas-viewport">
+                <svg class="erd-svg-layer" id="erd-svg-layer"></svg>
+                <div id="erd-nodes-container"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- View 4: Insights & Diagnostics -->
+          <section id="panel-insights" class="view-panel">
+            <div class="insights-scroll-area">
+              <div class="kpi-row">
+                <div class="kpi-box">
+                  <div class="kpi-label">Storage Allocated</div>
+                  <div class="kpi-number" id="kpi-storage">0 KB</div>
+                </div>
+                <div class="kpi-box">
+                  <div class="kpi-label">Active Tables</div>
+                  <div class="kpi-number" id="kpi-tables">0</div>
+                </div>
+                <div class="kpi-box">
+                  <div class="kpi-label">Total Rows</div>
+                  <div class="kpi-number" id="kpi-rows">0</div>
+                </div>
+                <div class="kpi-box">
+                  <div class="kpi-label">Indices & Constraints</div>
+                  <div class="kpi-number" id="kpi-indices">0</div>
+                </div>
+              </div>
+
+              <div class="insights-split">
+                <div class="insights-widget">
+                  <div class="widget-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="18" y1="20" x2="18" y2="10"></line>
+                      <line x1="12" y1="20" x2="12" y2="4"></line>
+                      <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                    Table Volume Distribution
+                  </div>
+                  <div id="insights-bar-chart" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                </div>
+
+                <div class="insights-widget">
+                  <div class="widget-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="3"></circle>
+                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    Engine Telemetry & Pragmas
+                  </div>
+                  <table class="kv-table" id="insights-pragma-kv"></table>
+                  <button id="btn-run-integrity-check" class="btn btn-secondary btn-sm" style="margin-top: 10px;">
+                    Execute PRAGMA integrity_check
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </main>
+      </div>
+
+      <!-- Desktop Software Bottom Status Bar -->
+      <footer class="studio-statusbar">
+        <div class="statusbar-left">
+          <span class="status-indicator">
+            <span class="cluster-dot"></span>
+            <span>WASM Engine: Ready</span>
+          </span>
+          <span id="sb-db-info">Database: Ready</span>
+          <span id="sb-encoding">Encoding: UTF-8</span>
+        </div>
+
+        <div class="statusbar-right">
+          <span>🔒 100% In-Memory (Zero Telemetry)</span>
+          <span id="sb-perf-time">Latency: 0.2ms</span>
+          <span>v1.2.0-pro</span>
+        </div>
+      </footer>
+
     </div>
-
-    <!-- Desktop Software Bottom Status Bar -->
-    <footer class="studio-statusbar">
-      <div class="statusbar-left">
-        <span class="status-indicator">
-          <span class="cluster-dot"></span>
-          <span>WASM Engine: Ready</span>
-        </span>
-        <span id="sb-db-info">Database: saas-production.db (61 KB)</span>
-        <span id="sb-encoding">Encoding: UTF-8</span>
-      </div>
-
-      <div class="statusbar-right">
-        <span>🔒 100% In-Memory (Zero Telemetry)</span>
-        <span id="sb-perf-time">Latency: 0.2ms</span>
-        <span>v1.2.0-pro</span>
-      </div>
-    </footer>
 
   </div>
 
