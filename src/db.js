@@ -1,7 +1,6 @@
 /**
- * SQLiteLens — Database Engine Layer
- * Wraps sql.js (WebAssembly) with high-level schema inspection,
- * pagination, sorting, query execution, and export tools.
+ * SQLiteLens — Professional Database Engine
+ * 100% Client-Side WebAssembly SQLite 3.x
  */
 
 class DatabaseEngine {
@@ -16,10 +15,11 @@ class DatabaseEngine {
   async initWasm() {
     if (this.SQL) return this.SQL;
     if (typeof window.initSqlJs !== 'function') {
-      throw new Error('sql.js is not loaded. Please ensure /sql-wasm.js is accessible.');
+      throw new Error('sql.js is not loaded. Please ensure sql-wasm.js is accessible.');
     }
+    const baseUrl = import.meta.env.BASE_URL || './';
     this.SQL = await window.initSqlJs({
-      locateFile: file => `/${file}`
+      locateFile: file => `${baseUrl}${file}`
     });
     return this.SQL;
   }
@@ -42,8 +42,11 @@ class DatabaseEngine {
 
   async loadFromUrl(url, displayName) {
     await this.initPromise;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`Failed to load ${url}: ${response.statusText}`);
+    const baseUrl = import.meta.env.BASE_URL || './';
+    const targetUrl = url.startsWith('http') ? url : `${baseUrl}${url.replace(/^\//, '')}`;
+    
+    const response = await fetch(targetUrl);
+    if (!response.ok) throw new Error(`Failed to load ${targetUrl}: ${response.statusText}`);
     
     const arrayBuffer = await response.arrayBuffer();
     const uInt8Array = new Uint8Array(arrayBuffer);
@@ -147,7 +150,6 @@ class DatabaseEngine {
   getTableColumns(tableName) {
     if (!this.db) return [];
     
-    // 1. Column info (name, type, notnull, pk)
     const infoRes = this.db.exec(`PRAGMA table_info("${tableName}")`);
     if (!infoRes.length) return [];
 
@@ -163,7 +165,6 @@ class DatabaseEngine {
       fkTargetCol: null
     }));
 
-    // 2. Foreign keys info
     try {
       const fkRes = this.db.exec(`PRAGMA foreign_key_list("${tableName}")`);
       if (fkRes.length) {
@@ -180,7 +181,7 @@ class DatabaseEngine {
         });
       }
     } catch (e) {
-      // Ignore if PRAGMA foreign_key_list fails
+      // Ignore
     }
 
     return columns;
@@ -192,7 +193,6 @@ class DatabaseEngine {
     const startTime = performance.now();
     const columns = this.getTableColumns(tableName);
 
-    // Build WHERE clause
     let whereClause = '';
     const params = [];
     if (filter.trim()) {
@@ -202,19 +202,16 @@ class DatabaseEngine {
       columns.forEach(() => params.push(`%${textFilter}%`));
     }
 
-    // Count query
     const countSql = `SELECT COUNT(*) FROM "${tableName}" ${whereClause}`;
     const countRes = this.db.exec(countSql, params);
     const totalCount = countRes.length && countRes[0].values.length ? countRes[0].values[0][0] : 0;
 
-    // Order By
     let orderClause = '';
     if (sortCol) {
       const safeDir = sortDir.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
       orderClause = `ORDER BY "${sortCol}" ${safeDir}`;
     }
 
-    // Data query with LIMIT & OFFSET
     const offset = (page - 1) * pageSize;
     const dataSql = `SELECT * FROM "${tableName}" ${whereClause} ${orderClause} LIMIT ${pageSize} OFFSET ${offset};`;
     const dataRes = this.db.exec(dataSql, params);
@@ -237,7 +234,7 @@ class DatabaseEngine {
   }
 
   executeQuery(sql) {
-    if (!this.db) throw new Error('No database loaded');
+    if (!this.db) throw new Error('No database connected');
     const startTime = performance.now();
 
     try {
@@ -250,7 +247,7 @@ class DatabaseEngine {
           rows: [],
           rowCount: 0,
           executionTimeMs,
-          message: 'Query executed successfully. 0 rows returned.'
+          message: 'Query executed successfully. 0 rows affected.'
         };
       }
 
@@ -271,7 +268,7 @@ class DatabaseEngine {
   }
 
   explainQuery(sql) {
-    if (!this.db) throw new Error('No database loaded');
+    if (!this.db) throw new Error('No database connected');
     const explainSql = `EXPLAIN QUERY PLAN ${sql}`;
     return this.executeQuery(explainSql);
   }
@@ -304,7 +301,7 @@ class DatabaseEngine {
   }
 
   checkIntegrity() {
-    if (!this.db) return 'No database open';
+    if (!this.db) return 'No database loaded';
     const res = this.db.exec('PRAGMA integrity_check');
     if (res.length && res[0].values.length) {
       return res[0].values.map(v => v[0]).join('\n');
@@ -371,13 +368,13 @@ class DatabaseEngine {
     if (!this.db) return '';
     const tables = this.getTables();
     let dump = `-- ==========================================================\n`;
-    dump += `-- SQLiteLens Database Dump\n`;
+    dump += `-- SQLiteLens Studio Database Export\n`;
     dump += `-- Database: ${this.dbName}\n`;
     dump += `-- Generated: ${new Date().toISOString()}\n`;
     dump += `-- ==========================================================\n\n`;
 
     tables.forEach(t => {
-      dump += `-- Table: ${t.name}\n`;
+      dump += `-- Table Schema: ${t.name}\n`;
       dump += `${t.sql};\n\n`;
 
       const dataRes = this.db.exec(`SELECT * FROM "${t.name}"`);

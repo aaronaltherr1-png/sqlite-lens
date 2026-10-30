@@ -1,44 +1,179 @@
 import initSqlJs from 'sql.js';
 import fs from 'fs';
 
-async function generateSampleDatabases() {
+async function generateProDatabases() {
   const SQL = await initSqlJs();
-  
-  // 1. E-Commerce Database
-  const dbEcommerce = new SQL.Database();
-  dbEcommerce.run(`
-    CREATE TABLE customers (
+
+  // ==========================================
+  // 1. SaaS Cloud Production Database (Default)
+  // ==========================================
+  const dbSaas = new SQL.Database();
+  dbSaas.run(`
+    CREATE TABLE organizations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      first_name TEXT NOT NULL,
-      last_name TEXT NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      country TEXT NOT NULL,
-      balance REAL DEFAULT 0.0,
+      name TEXT NOT NULL,
+      slug TEXT UNIQUE NOT NULL,
+      tier TEXT CHECK(tier IN ('free', 'starter', 'growth', 'enterprise')) DEFAULT 'starter',
+      monthly_revenue REAL DEFAULT 0.0,
+      billing_email TEXT NOT NULL,
+      region TEXT DEFAULT 'us-east-1',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
+    CREATE TABLE users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      org_id INTEGER REFERENCES organizations(id) ON DELETE CASCADE,
+      full_name TEXT NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      role TEXT CHECK(role IN ('owner', 'admin', 'developer', 'viewer')) DEFAULT 'developer',
+      mfa_enabled BOOLEAN DEFAULT 1,
+      last_active_at DATETIME,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE subscriptions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      org_id INTEGER REFERENCES organizations(id) ON DELETE CASCADE,
+      plan_name TEXT NOT NULL,
+      seat_count INTEGER DEFAULT 5,
+      price_per_month REAL NOT NULL,
+      status TEXT CHECK(status IN ('active', 'past_due', 'trialing', 'canceled')) DEFAULT 'active',
+      renews_at DATETIME
+    );
+
+    CREATE TABLE api_keys (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      org_id INTEGER REFERENCES organizations(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      key_prefix TEXT NOT NULL,
+      scopes TEXT DEFAULT 'read:all,write:events',
+      is_active BOOLEAN DEFAULT 1,
+      rate_limit_per_min INTEGER DEFAULT 1000,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE invoices (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      org_id INTEGER REFERENCES organizations(id) ON DELETE CASCADE,
+      invoice_number TEXT UNIQUE NOT NULL,
+      amount REAL NOT NULL,
+      currency TEXT DEFAULT 'USD',
+      status TEXT CHECK(status IN ('paid', 'pending', 'failed')) DEFAULT 'paid',
+      due_date DATETIME,
+      paid_at DATETIME
+    );
+
+    CREATE TABLE audit_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER REFERENCES users(id),
+      event_type TEXT NOT NULL,
+      severity TEXT CHECK(severity IN ('info', 'warning', 'critical')) DEFAULT 'info',
+      ip_address TEXT,
+      metadata TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE INDEX idx_users_org ON users(org_id);
+    CREATE INDEX idx_subscriptions_org ON subscriptions(org_id);
+    CREATE INDEX idx_invoices_org ON invoices(org_id);
+    CREATE INDEX idx_audit_user ON audit_events(user_id);
+  `);
+
+  dbSaas.run(`
+    INSERT INTO organizations (name, slug, tier, monthly_revenue, billing_email, region) VALUES
+      ('Acme Cloud Technologies', 'acme-cloud', 'enterprise', 4850.00, 'billing@acmecloud.io', 'us-east-1'),
+      ('HyperScale Data Labs', 'hyperscale-data', 'growth', 1250.00, 'finance@hyperscale.dev', 'eu-central-1'),
+      ('Vanguard AI Systems', 'vanguard-ai', 'enterprise', 8900.00, 'ops@vanguard.ai', 'us-west-2'),
+      ('PixelCraft Design Studio', 'pixelcraft', 'starter', 299.00, 'hello@pixelcraft.studio', 'eu-west-1'),
+      ('PulseMetrics Health', 'pulsemetrics', 'growth', 1890.00, 'accounts@pulsemetrics.health', 'us-east-2'),
+      ('IndieFlow Tools', 'indieflow', 'starter', 149.00, 'founder@indieflow.co', 'ap-southeast-1');
+
+    INSERT INTO users (org_id, full_name, email, role, mfa_enabled, last_active_at) VALUES
+      (1, 'Marcus Vance', 'marcus.v@acmecloud.io', 'owner', 1, '2026-10-30 18:24:10'),
+      (1, 'Elena Rostova', 'elena.r@acmecloud.io', 'admin', 1, '2026-10-30 17:10:45'),
+      (1, 'David Chen', 'david.c@acmecloud.io', 'developer', 1, '2026-10-30 16:55:00'),
+      (2, 'Sarah Jenkins', 'sarah@hyperscale.dev', 'owner', 1, '2026-10-30 18:02:19'),
+      (2, 'Liam Thorne', 'liam@hyperscale.dev', 'developer', 0, '2026-10-29 11:42:00'),
+      (3, 'Dr. Aris Thorne', 'aris@vanguard.ai', 'owner', 1, '2026-10-30 18:15:33'),
+      (3, 'Katarina Novak', 'k.novak@vanguard.ai', 'admin', 1, '2026-10-30 17:48:12'),
+      (4, 'Chloe Dupont', 'chloe@pixelcraft.studio', 'owner', 1, '2026-10-28 09:20:11'),
+      (5, 'Mateo Alvarez', 'mateo@pulsemetrics.health', 'owner', 1, '2026-10-30 14:11:00'),
+      (6, 'Kenji Sato', 'kenji@indieflow.co', 'owner', 0, '2026-10-30 18:29:50');
+
+    INSERT INTO subscriptions (org_id, plan_name, seat_count, price_per_month, status, renews_at) VALUES
+      (1, 'Enterprise Shield Plus', 45, 4850.00, 'active', '2026-11-20 00:00:00'),
+      (2, 'Growth Scale Pro', 15, 1250.00, 'active', '2026-11-15 00:00:00'),
+      (3, 'Ultra AI Dedicated Cluster', 90, 8900.00, 'active', '2026-12-01 00:00:00'),
+      (4, 'Team Starter Kit', 5, 299.00, 'active', '2026-11-10 00:00:00'),
+      (5, 'HIPAA Compliant Growth', 20, 1890.00, 'active', '2026-11-25 00:00:00'),
+      (6, 'Indie Solo License', 2, 149.00, 'active', '2026-11-05 00:00:00');
+
+    INSERT INTO api_keys (org_id, name, key_prefix, scopes, is_active, rate_limit_per_min) VALUES
+      (1, 'Production Webhook Dispatcher', 'ak_live_8f99', 'read:all,write:events,execute:pipeline', 1, 5000),
+      (1, 'CI/CD Automated Deploy Bot', 'ak_live_12b3', 'deploy:read,deploy:write', 1, 1000),
+      (2, 'Realtime Analytics Ingest', 'ak_live_7c44', 'write:telemetry', 1, 10000),
+      (3, 'Inference Gateway Cluster', 'ak_live_99d1', 'admin:full_access', 1, 20000),
+      (5, 'Telemetry Node Worker', 'ak_live_45a0', 'write:metrics', 1, 2500);
+
+    INSERT INTO invoices (org_id, invoice_number, amount, currency, status, due_date, paid_at) VALUES
+      (1, 'INV-2026-10-001', 4850.00, 'USD', 'paid', '2026-10-20 00:00:00', '2026-10-18 14:10:00'),
+      (2, 'INV-2026-10-002', 1250.00, 'USD', 'paid', '2026-10-15 00:00:00', '2026-10-15 09:30:00'),
+      (3, 'INV-2026-10-003', 8900.00, 'USD', 'paid', '2026-10-01 00:00:00', '2026-10-01 10:05:00'),
+      (4, 'INV-2026-10-004', 299.00, 'USD', 'paid', '2026-10-10 00:00:00', '2026-10-09 20:15:00'),
+      (5, 'INV-2026-10-005', 1890.00, 'USD', 'paid', '2026-10-25 00:00:00', '2026-10-24 16:45:00');
+
+    INSERT INTO audit_events (user_id, event_type, severity, ip_address, metadata) VALUES
+      (1, 'org.member_invited', 'info', '192.168.1.10', '{"invited_email": "tim@acmecloud.io", "role": "developer"}'),
+      (1, 'api_key.rotated', 'warning', '192.168.1.10', '{"key_id": 1, "reason": "regular_security_cadence"}'),
+      (2, 'security.mfa_enforced', 'info', '84.112.5.30', '{"policy": "strict_totp"}'),
+      (3, 'database.replica_promoted', 'warning', '178.62.90.11', '{"cluster": "us-east-primary-01"}'),
+      (6, 'inference.model_swapped', 'critical', '54.210.12.9', '{"previous": "llama-3-8b", "current": "deepseek-coder"}');
+  `);
+
+  const binarySaas = Buffer.from(dbSaas.export());
+  fs.writeFileSync('public/saas-production.db', binarySaas);
+  console.log('✓ Generated public/saas-production.db (' + binarySaas.length + ' bytes)');
+
+  // ==========================================
+  // 2. E-Commerce Store Database (English)
+  // ==========================================
+  const dbEcom = new SQL.Database();
+  dbEcom.run(`
     CREATE TABLE categories (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL UNIQUE,
-      slug TEXT NOT NULL
+      slug TEXT NOT NULL,
+      product_count INTEGER DEFAULT 0
     );
 
     CREATE TABLE products (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       category_id INTEGER REFERENCES categories(id),
-      name TEXT NOT NULL,
+      title TEXT NOT NULL,
+      sku TEXT UNIQUE NOT NULL,
       price REAL NOT NULL,
-      stock INTEGER DEFAULT 0,
+      stock_quantity INTEGER DEFAULT 0,
       rating REAL DEFAULT 4.5,
-      is_active BOOLEAN DEFAULT 1
+      is_featured BOOLEAN DEFAULT 1
+    );
+
+    CREATE TABLE customers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      first_name TEXT NOT NULL,
+      last_name TEXT NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      city TEXT NOT NULL,
+      country_code TEXT DEFAULT 'US',
+      lifetime_value REAL DEFAULT 0.0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE orders (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       customer_id INTEGER REFERENCES customers(id),
       order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-      total_amount REAL NOT NULL,
-      status TEXT CHECK(status IN ('pending', 'completed', 'shipped', 'cancelled')) DEFAULT 'pending'
+      total_usd REAL NOT NULL,
+      status TEXT CHECK(status IN ('pending', 'processing', 'completed', 'cancelled')) DEFAULT 'completed'
     );
 
     CREATE TABLE order_items (
@@ -49,143 +184,52 @@ async function generateSampleDatabases() {
       unit_price REAL NOT NULL
     );
 
-    CREATE TABLE reviews (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      product_id INTEGER REFERENCES products(id),
-      customer_id INTEGER REFERENCES customers(id),
-      rating INTEGER CHECK(rating BETWEEN 1 AND 5),
-      comment TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
+    INSERT INTO categories (name, slug, product_count) VALUES
+      ('Developer Workstations', 'workstations', 4),
+      ('Mechanical Keyboards', 'keyboards', 8),
+      ('Studio Audio Gear', 'audio', 6),
+      ('Ergonomic Furniture', 'furniture', 3);
 
-    CREATE INDEX idx_orders_customer ON orders(customer_id);
-    CREATE INDEX idx_products_category ON products(category_id);
-    CREATE INDEX idx_items_order ON order_items(order_id);
-  `);
+    INSERT INTO products (category_id, title, sku, price, stock_quantity, rating) VALUES
+      (1, 'MacBook Pro 16" M3 Max (64GB RAM)', 'HW-MBP-16-M3', 3499.00, 14, 4.9),
+      (1, 'ThinkPad P1 Gen 6 Workstation', 'HW-TP-P1-G6', 2899.00, 9, 4.8),
+      (2, 'Keychron Q1 Pro Wireless Custom', 'KB-KC-Q1P', 199.99, 45, 4.7),
+      (2, 'HHKB Professional Hybrid Type-S', 'KB-HHKB-HYB', 320.00, 22, 4.9),
+      (3, 'Sony WH-1000XM5 Studio Edition', 'AU-SNY-XM5', 399.00, 60, 4.8),
+      (3, 'Shure SM7B Vocal Dynamic Mic', 'AU-SHR-SM7B', 389.00, 31, 4.9),
+      (4, 'Herman Miller Aeron Chair (Size B)', 'FR-HM-AERON', 1495.00, 12, 4.9),
+      (4, 'Jarvis Bamboo Standing Desk 72x30', 'FR-JR-BAM72', 749.00, 18, 4.7);
 
-  dbEcommerce.run(`
-    INSERT INTO categories (name, slug) VALUES 
-      ('Electronics', 'electronics'),
-      ('Audio & Sound', 'audio-sound'),
-      ('Accessories', 'accessories'),
-      ('Smart Home', 'smart-home');
+    INSERT INTO customers (first_name, last_name, email, city, country_code, lifetime_value) VALUES
+      ('Alexander', 'Wright', 'alex.wright@hey.com', 'San Francisco', 'US', 5394.00),
+      ('Sophia', 'Nakamura', 'sophia.n@techlabs.jp', 'Tokyo', 'JP', 3219.00),
+      ('Felix', 'Vanderbilt', 'felix.v@amsterdam.dev', 'Amsterdam', 'NL', 1895.00),
+      ('Amara', 'Okonkwo', 'amara.o@cloudscale.ng', 'Lagos', 'NG', 4288.00),
+      ('Liam', 'MacKenzie', 'liam.m@edinburgh.uk', 'Edinburgh', 'UK', 1069.00);
 
-    INSERT INTO products (category_id, name, price, stock, rating, is_active) VALUES
-      (1, 'UltraBook Pro 16"', 1899.99, 45, 4.8, 1),
-      (1, 'Mechanical Keyboard RGB', 129.50, 110, 4.7, 1),
-      (2, 'Noise-Cancelling Headphones Max', 349.00, 68, 4.9, 1),
-      (2, 'Wireless Earbuds Pro', 179.99, 140, 4.6, 1),
-      (3, 'USB-C Thunderbolt Hub 10-in-1', 79.99, 215, 4.5, 1),
-      (3, 'Ergonomic Vertical Mouse', 59.95, 85, 4.3, 1),
-      (4, 'Smart Ambient LED Bar', 89.00, 95, 4.6, 1),
-      (4, 'Smart Plug Mini (4-Pack)', 39.99, 320, 4.4, 1);
-
-    INSERT INTO customers (first_name, last_name, email, country, balance) VALUES
-      ('Alexander', 'Schmidt', 'alex.schmidt@berlin.de', 'Germany', 450.00),
-      ('Sophia', 'Chen', 'sophia.chen@techcorp.io', 'USA', 120.50),
-      ('Elena', 'Rostova', 'elena.rostova@mail.eu', 'France', 890.00),
-      ('Lucas', 'Silva', 'lucas.silva@devs.br', 'Brazil', 0.00),
-      ('Liam', 'O''Connor', 'liam.oc@dublin.ie', 'Ireland', 310.25),
-      ('Mia', 'Müller', 'mia.mueller@zurich.ch', 'Switzerland', 1450.00),
-      ('Kenji', 'Takahashi', 'kenji.t@tokyo.jp', 'Japan', 75.00),
-      ('Amira', 'Mansour', 'amira.m@cairo.eg', 'Egypt', 220.00);
-
-    INSERT INTO orders (customer_id, total_amount, status) VALUES
-      (1, 2029.49, 'completed'),
-      (2, 349.00, 'shipped'),
-      (3, 139.94, 'pending'),
-      (5, 1899.99, 'completed'),
-      (6, 428.99, 'shipped'),
-      (7, 59.95, 'completed');
+    INSERT INTO orders (customer_id, total_usd, status) VALUES
+      (1, 3698.99, 'completed'),
+      (2, 3219.00, 'completed'),
+      (3, 1895.00, 'completed'),
+      (4, 3888.00, 'processing'),
+      (5, 1069.00, 'completed');
 
     INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES
-      (1, 1, 1, 1899.99),
-      (1, 2, 1, 129.50),
-      (2, 3, 1, 349.00),
-      (3, 3, 1, 79.99),
-      (3, 4, 1, 59.95),
-      (4, 1, 1, 1899.99),
-      (5, 3, 1, 349.00),
-      (5, 4, 1, 79.99),
-      (6, 6, 1, 59.95);
-
-    INSERT INTO reviews (product_id, customer_id, rating, comment) VALUES
-      (1, 1, 5, 'Superb build quality, the screen is incredible for programming!'),
-      (3, 2, 5, 'Best active noise cancellation on flights. Extremely comfortable.'),
-      (2, 5, 4, 'Tactile clicky switches feel great, software could be slightly simpler.');
+      (1, 1, 1, 3499.00),
+      (1, 3, 1, 199.99),
+      (2, 2, 1, 2899.00),
+      (2, 4, 1, 320.00),
+      (3, 7, 1, 1495.00),
+      (3, 5, 1, 399.00),
+      (4, 1, 1, 3499.00),
+      (4, 6, 1, 389.00),
+      (5, 8, 1, 749.00),
+      (5, 4, 1, 320.00);
   `);
 
-  const binaryEcommerce = dbEcommerce.export();
-  fs.writeFileSync('public/sample-ecommerce.db', Buffer.from(binaryEcommerce));
-  console.log('✓ Created public/sample-ecommerce.db (' + binaryEcommerce.length + ' bytes)');
-
-  // 2. SaaS Analytics Database
-  const dbAnalytics = new SQL.Database();
-  dbAnalytics.run(`
-    CREATE TABLE accounts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      org_name TEXT NOT NULL,
-      tier TEXT CHECK(tier IN ('free', 'starter', 'pro', 'enterprise')) DEFAULT 'free',
-      mrr REAL DEFAULT 0.0,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      account_id INTEGER REFERENCES accounts(id),
-      name TEXT NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      role TEXT CHECK(role IN ('owner', 'admin', 'member')) DEFAULT 'member',
-      last_login DATETIME
-    );
-
-    CREATE TABLE feature_flags (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      key TEXT NOT NULL UNIQUE,
-      description TEXT,
-      enabled BOOLEAN DEFAULT 0,
-      rollout_percent INTEGER DEFAULT 100
-    );
-
-    CREATE TABLE activity_logs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER REFERENCES users(id),
-      action TEXT NOT NULL,
-      metadata JSON,
-      ip_address TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    INSERT INTO accounts (org_name, tier, mrr) VALUES
-      ('Acme Corp', 'enterprise', 2400.00),
-      ('Starlight Studio', 'pro', 499.00),
-      ('NextWave Labs', 'starter', 99.00),
-      ('Solo Indie Dev', 'free', 0.00);
-
-    INSERT INTO users (account_id, name, email, role, last_login) VALUES
-      (1, 'Sarah Connor', 'sarah@acme.com', 'owner', '2026-10-30 14:22:00'),
-      (1, 'John Smith', 'john@acme.com', 'admin', '2026-10-29 09:15:00'),
-      (2, 'Elena Gilbert', 'elena@starlight.io', 'owner', '2026-10-30 16:45:00'),
-      (3, 'David Kim', 'david@nextwave.dev', 'owner', '2026-10-28 11:30:00'),
-      (4, 'Marco Rossi', 'marco@indie.it', 'owner', '2026-10-30 17:01:00');
-
-    INSERT INTO feature_flags (key, description, enabled, rollout_percent) VALUES
-      ('ai_copilot_v2', 'New agentic assistant in chat', 1, 50),
-      ('dark_mode_oled', 'True pitch black OLED theme', 1, 100),
-      ('enterprise_sso', 'SAML 2.0 / Okta integration', 1, 100),
-      ('realtime_sync', 'WebSocket bidirectional delta replication', 0, 10);
-
-    INSERT INTO activity_logs (user_id, action, metadata, ip_address) VALUES
-      (1, 'user.login', '{"browser": "Chrome", "os": "macOS"}', '192.168.1.10'),
-      (1, 'project.deploy', '{"env": "production", "commit": "a8f3b2"}', '192.168.1.10'),
-      (2, 'subscription.upgrade', '{"plan": "pro", "interval": "yearly"}', '84.112.5.30'),
-      (3, 'api_key.create', '{"scopes": ["read", "write"]}', '178.62.90.11'),
-      (5, 'export.csv', '{"table": "analytics_oct"}', '92.204.14.77');
-  `);
-
-  const binaryAnalytics = dbAnalytics.export();
-  fs.writeFileSync('public/sample-analytics.db', Buffer.from(binaryAnalytics));
-  console.log('✓ Created public/sample-analytics.db (' + binaryAnalytics.length + ' bytes)');
+  const binaryEcom = Buffer.from(dbEcom.export());
+  fs.writeFileSync('public/ecommerce-store.db', binaryEcom);
+  console.log('✓ Generated public/ecommerce-store.db (' + binaryEcom.length + ' bytes)');
 }
 
-generateSampleDatabases().catch(console.error);
+generateProDatabases().catch(console.error);

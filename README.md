@@ -1,84 +1,67 @@
 <div align="center">
 
-# 🔍 SQLiteLens
+# 🔍 SQLiteLens Studio
 
-### *The modern, privacy-first SQLite studio that doesn't look like Windows 98.*
+### *Professional Desktop-Grade SQLite Workbench in Your Browser*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-6366f1.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Engine: WebAssembly](https://img.shields.io/badge/Engine-SQLite%20WASM-38bdf8.svg?style=flat-square)](https://sqlite.org)
-[![Privacy: 100% Client-Side](https://img.shields.io/badge/Privacy-100%25%20Client--Side-10b981.svg?style=flat-square)](#-100-privacy-guarantee)
-[![Zero Install](https://img.shields.io/badge/Zero%20Install-In--Browser-f59e0b.svg?style=flat-square)](#)
+[![Privacy: 100% Client-Side](https://img.shields.io/badge/Privacy-100%25%20In--Memory-10b981.svg?style=flat-square)](#-100-privacy-guarantee)
+[![Zero Install](https://img.shields.io/badge/Zero%20Install-Web%20Studio-f59e0b.svg?style=flat-square)](#)
 
 <p align="center">
-  <b>Zero install. Zero telemetry. Instant startup.</b><br>
-  Drag and drop any <code>.sqlite</code>, <code>.db</code>, or <code>.sqlite3</code> file to inspect schemas, explore data, generate interactive visual ERD diagrams, run queries, and export reports.
+  <b>Instant boot. Full desktop workbench interface. Zero telemetry.</b><br>
+  Interactive visual ERD diagrams, high-performance data grid, SQL query console with execution timers, command palette (<code>⌘K</code>), and comprehensive data export.
 </p>
 
-[**🚀 Try the Live Demo**](https://aaronaltherr1-png.github.io/sqlite-lens) • [**Report a Bug**](https://github.com/aaronaltherr1-png/sqlite-lens/issues) • [**Request Feature**](https://github.com/aaronaltherr1-png/sqlite-lens/issues)
+[**🚀 Launch SQLiteLens Studio Live**](https://aaronaltherr1-png.github.io/sqlite-lens) • [**Report an Issue**](https://github.com/aaronaltherr1-png/sqlite-lens/issues) • [**Request Feature**](https://github.com/aaronaltherr1-png/sqlite-lens/issues)
 
 </div>
 
 ---
 
-## ⚡ Why SQLiteLens?
+## ⚡ Overview
 
-Almost every developer regularly works with SQLite — whether for iOS/Android mobile apps, local web development (Next.js, Django, Rails), edge computing (Cloudflare D1, Turso), or data science.
+**SQLiteLens Studio** is built for engineers and data analysts who need the speed and keyboard-first workflow of desktop tools like TablePlus and DataGrip, but without heavy 300MB downloads, license costs, or cloud privacy risks.
 
-Yet the current tooling ecosystem forces developers to choose between:
-1. **Ancient, clunky UIs** (like *DB Browser for SQLite*, built in the early 2000s).
-2. **Expensive commercial tools** (like *TablePlus*, costing $89+).
-3. **Bloated 300MB Electron apps** that take seconds to start and chew through battery.
-
-**SQLiteLens** solves this. It gives you the aesthetics and keyboard-first speed of a premium tool, but 100% open-source, free, and lightweight via pure WebAssembly.
+Running 100% client-side via SQLite 3.x compiled to WebAssembly, your database is mounted strictly in local browser memory. Zero bytes leave your machine.
 
 ---
 
-## 📊 Feature Comparison
+## ✨ Features & Capabilities
 
-| Feature | **SQLiteLens** | **DB Browser for SQLite** | **TablePlus** | **Beekeeper Studio** |
-| :--- | :---: | :---: | :---: | :---: |
-| **Price** | **100% Free** | 100% Free | $89+ | Freemium ($69/yr) |
-| **License** | **MIT Open Source** | GPL v3 | Proprietary | Mix (GPL/Commercial) |
-| **Startup Speed** | **< 100 ms** | Fast | Fast | Slow (Electron) |
-| **Interactive Visual ERD** | **✅ Built-in** | ❌ No | ⚠️ Paid only | ❌ No |
-| **Zero-Install (Browser/PWA)**| **✅ Yes** | ❌ No | ❌ No | ❌ No |
-| **Modern Dark Mode & UI** | **✅ Polished** | ❌ Windows 98 style | ✅ Polished | ✅ Good |
-| **100% Client-Side Privacy** | **✅ Zero Network** | ✅ Offline | ⚠️ Cloud Sync | ⚠️ Cloud Sync |
-
----
-
-## ✨ Key Features
-
-* **🏎️ Instant WebAssembly Engine:** Powered by compiled SQLite WASM (`sql.js`). Loads and parses multi-megabyte databases in milliseconds directly in memory.
-* **🕸️ Interactive Visual ERD (Entity Relationship Diagram):** Automatically analyzes tables, Primary Keys (`🔑`), and Foreign Keys (`🔗`), rendering interactive draggable nodes with dynamic SVG Bézier curves.
+* **🖥️ Desktop Workbench UI:**
+  * Native macOS-inspired window controls and titlebar breadcrumbs.
+  * Multi-workspace sidebar with 1-click database cluster switching.
+  * Integrated **Command Palette (`Ctrl+K` / `⌘K`)** for lightning-fast table jumping and action dispatching.
+  * Desktop bottom status bar with memory, encoding, and execution latency telemetry.
 * **📊 High-Performance Data Grid:**
-  * Real-time fuzzy text search across all columns.
+  * Realtime fuzzy filtering across all active columns.
   * Instant column sorting (ASC/DESC).
-  * Column data type indicators (`INTEGER`, `TEXT`, `REAL`, `BLOB`).
-  * Cell inspector modal for formatted JSON and long text blobs.
-  * Pagination with configurable page sizes.
-* **⚡ SQL Query Studio:**
-  * Syntax-highlighted scratchpad with keyboard shortcuts (`Ctrl+Enter` / `Cmd+Enter`).
-  * Query execution timer with millisecond resolution (`✓ 124 rows in 1.2ms`).
-  * Instant `EXPLAIN QUERY PLAN` helper to analyze SQLite bytecode and indexing.
-  * Pre-configured quick query templates.
-* **📈 Database Insights & Pragmas:**
-  * KPI overview (Database size, table counts, row counts, index counts).
-  * Visual bar charts for table row distributions.
-  * Inspect low-level SQLite PRAGMAs (`page_size`, `encoding`, `journal_mode`, `user_version`).
-  * One-click `PRAGMA integrity_check`.
-* **📤 Comprehensive Export Options:**
-  * Export any active table to **CSV** or **JSON**.
-  * Export SQL query results to **CSV**.
-  * Generate a full, complete `.sql` database dump with `CREATE TABLE` and `INSERT` statements.
-* **🔒 100% Client-Side Privacy:**
-  * Your database file never leaves your machine. No servers, no telemetry, no tracking. Everything runs strictly in your local browser sandbox.
+  * Typed column pill indicators (`INTEGER`, `TEXT`, `REAL`, `BLOB`, `🔑 PK`, `🔗 FK`).
+  * Cell inspection drawer with pretty-printed JSON formatting.
+  * Configurable pagination.
+* **⚡ SQL Studio & Query Console:**
+  * Monospace code editor with quick snippet pills.
+  * Keyboard execution shortcut (`Ctrl+Enter` / `Cmd+Enter`).
+  * Query execution timer with sub-millisecond precision (`✓ 45 rows in 0.4ms`).
+  * Direct `EXPLAIN QUERY PLAN` helper for bytecode and index performance tuning.
+* **🕸️ Interactive Visual ERD (Entity Relationship Diagram):**
+  * Automatic schema graph generation with draggable cards.
+  * Dynamic SVG Bézier cables pinning foreign key columns directly to parent primary keys.
+  * Canvas zoom, auto-layout, and relation highlight effects.
+* **📈 Diagnostics & Health Telemetry:**
+  * Realtime storage allocation KPIs and table volume distributions.
+  * SQLite PRAGMA inspection (`page_size`, `journal_mode`, `encoding`, `user_version`).
+  * One-click `PRAGMA integrity_check` execution.
+* **📤 Comprehensive Data Exports:**
+  * Active table export to **CSV** or **JSON**.
+  * Query dataset export to **CSV**.
+  * Complete `.sql` schema & data dump creation.
 
 ---
 
-## 🚀 Quickstart (Running Locally)
-
-You can clone and run SQLiteLens locally in 3 simple steps:
+## 🚀 Local Development
 
 ```bash
 # 1. Clone the repository
@@ -88,47 +71,24 @@ cd sqlite-lens
 # 2. Install dependencies
 npm install
 
-# 3. Start development server
+# 3. Start local development server
 npm run dev
 ```
 
-Open `http://localhost:3000` in your browser. You're ready to go!
+Open `http://localhost:3000` in your browser.
 
 ---
 
-## 📦 Building for Production / Self-Hosting
-
-SQLiteLens generates a static bundle that can be deployed to any static host (GitHub Pages, Cloudflare Pages, Vercel, Netlify, or an internal NGINX server):
+## 📦 Production Build
 
 ```bash
 npm run build
 ```
 
-The resulting `dist/` folder contains pure static HTML, CSS, JavaScript, and WASM files with zero server runtime dependencies.
-
-A ready-to-use GitHub Actions workflow is provided in [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) for automated 1-click GitHub Pages deployment.
-
----
-
-## 🛠️ Tech Stack & Architecture
-
-* **Engine:** SQLite 3.x compiled to WebAssembly via [sql.js](https://github.com/sql-js/sql.js)
-* **Structure & Logic:** Semantic HTML5 & Modern Vanilla ES Modules
-* **Styling:** Bespoke, high-performance Vanilla CSS Design System with dark/light themes and glassmorphism (Zero heavy CSS utility bloat)
-* **Icons:** [Lucide Icons](https://lucide.dev)
-* **Dev Server & Bundler:** [Vite 5](https://vitejs.dev)
-
----
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are very welcome!
-Check out [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
-
-If SQLiteLens helped you inspect your databases, consider giving it a ⭐️ on GitHub!
+The resulting `dist/` folder contains optimized static assets ready for deployment to GitHub Pages, Cloudflare Pages, Vercel, or Netlify.
 
 ---
 
 ## 📄 License
 
-This project is open-source and available under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE).

@@ -1,7 +1,6 @@
 /**
- * SQLiteLens — Interactive Visual ERD (Entity Relationship Diagram)
- * Generates draggable table cards and computes dynamic SVG Bézier curves
- * linking foreign key columns to referenced primary key columns.
+ * SQLiteLens Studio — Interactive Visual ERD
+ * Professional relationship diagram with draggable cards and SVG curves.
  */
 
 export class ErdViewer {
@@ -11,8 +10,8 @@ export class ErdViewer {
     this.nodesLayer = document.getElementById(nodesLayerId);
     
     this.tables = [];
-    this.nodes = new Map(); // tableName -> { element, x, y, width, height }
-    this.relationships = []; // [{ fromTable, fromCol, toTable, toCol }]
+    this.nodes = new Map();
+    this.relationships = [];
     this.zoom = 1;
     this.draggedNode = null;
     this.dragOffset = { x: 0, y: 0 };
@@ -23,7 +22,6 @@ export class ErdViewer {
   initEventListeners() {
     window.addEventListener('resize', () => this.updateAllConnections());
 
-    // Drag and drop node logic
     this.nodesLayer.addEventListener('mousedown', e => {
       const header = e.target.closest('.erd-node-header');
       if (!header) return;
@@ -76,21 +74,20 @@ export class ErdViewer {
 
     if (!tables.length) {
       this.nodesLayer.innerHTML = `
-        <div style="padding: 40px; text-align: center; color: var(--text-muted);">
+        <div style="padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
           No tables found in this database.
         </div>
       `;
       return;
     }
 
-    // Determine layout: Grid layout
     const colsCount = Math.min(3, Math.ceil(Math.sqrt(tables.length)));
-    const colWidth = 320;
-    const rowHeight = 280;
+    const colWidth = 310;
+    const rowHeight = 260;
 
     tables.forEach((table, index) => {
-      const gridX = (index % colsCount) * colWidth + 60;
-      const gridY = Math.floor(index / colsCount) * rowHeight + 60;
+      const gridX = (index % colsCount) * colWidth + 50;
+      const gridY = Math.floor(index / colsCount) * rowHeight + 50;
 
       const nodeEl = document.createElement('div');
       nodeEl.className = 'erd-node';
@@ -98,13 +95,12 @@ export class ErdViewer {
       nodeEl.style.left = `${gridX}px`;
       nodeEl.style.top = `${gridY}px`;
 
-      // Header
       let columnsHtml = '';
       table.columns.forEach(col => {
         let badges = '';
-        if (col.isPk) badges += '<span class="col-pk-tag" title="Primary Key">🔑</span>';
+        if (col.isPk) badges += '<span title="Primary Key" style="color: var(--accent-amber); margin-right: 4px;">🔑</span>';
         if (col.isFk) {
-          badges += `<span style="color: var(--accent-cyan); font-size: 0.75rem;" title="Foreign Key -> ${col.fkTargetTable}.${col.fkTargetCol}">🔗</span>`;
+          badges += `<span title="Foreign Key -> ${col.fkTargetTable}.${col.fkTargetCol}" style="color: var(--accent-cyan); margin-right: 4px;">🔗</span>`;
           this.relationships.push({
             fromTable: table.name,
             fromCol: col.name,
@@ -126,8 +122,15 @@ export class ErdViewer {
 
       nodeEl.innerHTML = `
         <div class="erd-node-header">
-          <span>${table.name}</span>
-          <span style="font-size: 0.75rem; color: var(--text-faint); font-family: var(--font-mono);">${table.rowCount} rows</span>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+            <span>${table.name}</span>
+          </div>
+          <span style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono);">${table.rowCount} rows</span>
         </div>
         <div class="erd-node-columns">
           ${columnsHtml}
@@ -139,12 +142,11 @@ export class ErdViewer {
         element: nodeEl,
         x: gridX,
         y: gridY,
-        width: 250,
+        width: 260,
         height: nodeEl.offsetHeight || 200
       });
     });
 
-    // Initial render of SVG paths
     requestAnimationFrame(() => {
       this.updateAllConnections();
     });
@@ -153,14 +155,13 @@ export class ErdViewer {
   updateAllConnections() {
     this.svg.innerHTML = '';
     
-    // SVG defs for arrow marker and gradient
     const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
     defs.innerHTML = `
-      <linearGradient id="relGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <linearGradient id="erdGrad" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.9" />
         <stop offset="100%" stop-color="#6366f1" stop-opacity="0.9" />
       </linearGradient>
-      <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <marker id="arrowHead" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
         <path d="M 0 1 L 10 5 L 0 9 z" fill="#6366f1" />
       </marker>
     `;
@@ -171,11 +172,7 @@ export class ErdViewer {
       const toNode = this.nodes.get(rel.toTable);
       if (!fromNode || !toNode) return;
 
-      const fromRect = fromNode.element.getBoundingClientRect();
-      const toRect = toNode.element.getBoundingClientRect();
       const containerRect = this.container.getBoundingClientRect();
-
-      // Find specific column DOM elements to pin lines exactly to the column row
       const fromColEl = fromNode.element.querySelector(`[data-col="${rel.fromCol}"]`);
       const toColEl = toNode.element.querySelector(`[data-col="${rel.toCol}"]`);
 
@@ -192,7 +189,6 @@ export class ErdViewer {
         endY = (colRect.top - containerRect.top + this.container.scrollTop + colRect.height / 2) / this.zoom;
       }
 
-      // Determine left or right anchor
       let startX, endX;
       if (fromNode.x < toNode.x) {
         startX = fromNode.x + fromNode.element.offsetWidth;
@@ -202,8 +198,7 @@ export class ErdViewer {
         endX = toNode.x + toNode.element.offsetWidth;
       }
 
-      // Smooth Cubic Bézier Curve
-      const dx = Math.abs(endX - startX) * 0.55;
+      const dx = Math.abs(endX - startX) * 0.5;
       const control1X = startX + (fromNode.x < toNode.x ? dx : -dx);
       const control1Y = startY;
       const control2X = endX + (fromNode.x < toNode.x ? -dx : dx);
@@ -211,20 +206,19 @@ export class ErdViewer {
 
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       path.setAttribute('d', `M ${startX} ${startY} C ${control1X} ${control1Y}, ${control2X} ${control2Y}, ${endX} ${endY}`);
-      path.setAttribute('stroke', 'url(#relGrad)');
-      path.setAttribute('stroke-width', '2.5');
+      path.setAttribute('stroke', 'url(#erdGrad)');
+      path.setAttribute('stroke-width', '2');
       path.setAttribute('fill', 'none');
       path.setAttribute('stroke-linecap', 'round');
-      path.setAttribute('marker-end', 'url(#arrow)');
+      path.setAttribute('marker-end', 'url(#arrowHead)');
 
-      // Glow effect path underneath
-      const glowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      glowPath.setAttribute('d', `M ${startX} ${startY} C ${control1X} ${control1Y}, ${control2X} ${control2Y}, ${endX} ${endY}`);
-      glowPath.setAttribute('stroke', 'rgba(99, 102, 241, 0.25)');
-      glowPath.setAttribute('stroke-width', '6');
-      glowPath.setAttribute('fill', 'none');
+      const glow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      glow.setAttribute('d', `M ${startX} ${startY} C ${control1X} ${control1Y}, ${control2X} ${control2Y}, ${endX} ${endY}`);
+      glow.setAttribute('stroke', 'rgba(99, 102, 241, 0.2)');
+      glow.setAttribute('stroke-width', '5');
+      glow.setAttribute('fill', 'none');
 
-      this.svg.appendChild(glowPath);
+      this.svg.appendChild(glow);
       this.svg.appendChild(path);
     });
   }
@@ -234,7 +228,7 @@ export class ErdViewer {
   }
 
   setZoom(delta) {
-    this.zoom = Math.max(0.5, Math.min(2.0, this.zoom + delta));
+    this.zoom = Math.max(0.6, Math.min(1.8, this.zoom + delta));
     this.nodesLayer.style.transform = `scale(${this.zoom})`;
     this.nodesLayer.style.transformOrigin = '0 0';
     this.svg.style.transform = `scale(${this.zoom})`;
