@@ -16,6 +16,12 @@
 
 [**🚀 Launch SQLiteLens Studio Live**](https://aaronaltherr1-png.github.io/sqlite-lens) • [**Report an Issue**](https://github.com/aaronaltherr1-png/sqlite-lens/issues) • [**Request Feature**](https://github.com/aaronaltherr1-png/sqlite-lens/issues)
 
+<br><br>
+
+<p align="center">
+  <img src="media/preview.svg" alt="SQLiteLens Studio Interface Preview" width="100%">
+</p>
+
 </div>
 
 ---

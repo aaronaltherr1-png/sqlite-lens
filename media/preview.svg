@@ -1,0 +1,302 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" width="100%" height="100%" fill="none">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGlow" cx="50%" cy="0%" r="80%" fx="50%" fy="0%">
+      <stop offset="0%" stop-color="#1e1b4b" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#0f172a" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#030712" stop-opacity="1"/>
+    </radialGradient>
+
+    <!-- Card Gradients -->
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.95"/>
+    </linearGradient>
+
+    <linearGradient id="primaryGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+
+    <linearGradient id="bezierGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+
+    <!-- Drop Shadows -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+
+    <filter id="glowFilter" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="1200" height="680" rx="16" fill="url(#bgGlow)"/>
+  
+  <!-- Subtle Grid Pattern in Background -->
+  <g opacity="0.08" stroke="#94a3b8" stroke-width="1">
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40"/>
+    </pattern>
+    <rect width="1200" height="680" fill="url(#grid)" />
+  </g>
+
+  <!-- Decorative Accent Glows -->
+  <circle cx="200" cy="100" r="140" fill="#6366f1" opacity="0.15" filter="url(#glowFilter)"/>
+  <circle cx="1000" cy="500" r="160" fill="#06b6d4" opacity="0.12" filter="url(#glowFilter)"/>
+
+  <!-- ==================== MAIN WORKBENCH WINDOW ==================== -->
+  <g transform="translate(60, 40)" filter="url(#shadow)">
+    <!-- Outer Window Frame -->
+    <rect width="1080" height="600" rx="12" fill="#090d16" stroke="#334155" stroke-width="1.2"/>
+    <rect width="1080" height="600" rx="12" fill="url(#cardGrad)"/>
+
+    <!-- TITLEBAR -->
+    <rect width="1080" height="44" rx="12" fill="#0b1120"/>
+    <!-- Overlap to flatten bottom corners of titlebar -->
+    <rect y="32" width="1080" height="12" fill="#0b1120"/>
+    <line x1="0" y1="44" x2="1080" y2="44" stroke="#1e293b" stroke-width="1"/>
+
+    <!-- macOS Window Buttons -->
+    <circle cx="24" cy="22" r="6" fill="#ef4444"/>
+    <circle cx="44" cy="22" r="6" fill="#f59e0b"/>
+    <circle cx="64" cy="22" r="6" fill="#10b981"/>
+
+    <!-- Title & Breadcrumb -->
+    <g transform="translate(100, 14)">
+      <rect width="20" height="18" rx="4" fill="#6366f1" fill-opacity="0.2"/>
+      <text x="5" y="13" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="11" font-weight="700" fill="#818cf8">⌕</text>
+      <text x="28" y="13" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="12" font-weight="600" fill="#f8fafc">SQLiteLens Studio</text>
+      <text x="142" y="13" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="12" fill="#64748b">/</text>
+      <text x="156" y="13" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="12" font-weight="500" fill="#94a3b8">ecommerce-store.db</text>
+    </g>
+
+    <!-- Top Navigation Actions -->
+    <g transform="translate(740, 10)">
+      <!-- Command Palette Pill -->
+      <rect width="130" height="24" rx="6" fill="#1e293b" stroke="#334155" stroke-width="0.8"/>
+      <text x="12" y="16" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="11" fill="#94a3b8">Search (⌘K)</text>
+
+      <!-- Live badge -->
+      <rect x="140" width="180" height="24" rx="6" fill="#10b981" fill-opacity="0.15" stroke="#10b981" stroke-width="0.8"/>
+      <circle cx="152" cy="12" r="3.5" fill="#10b981"/>
+      <text x="162" y="16" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="11" font-weight="600" fill="#34d399">100% Client-Side WASM</text>
+    </g>
+
+    <!-- ==================== LEFT SIDEBAR ==================== -->
+    <g transform="translate(0, 44)">
+      <!-- Sidebar Background -->
+      <rect width="220" height="526" fill="#070c18" stroke="#1e293b" stroke-width="1"/>
+      
+      <!-- Workspace header -->
+      <text x="16" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="11" font-weight="700" fill="#64748b" letter-spacing="0.5">TABLES (4)</text>
+
+      <!-- Active Table: users -->
+      <rect x="8" y="40" width="204" height="34" rx="6" fill="#1e293b"/>
+      <rect x="8" y="40" width="3" height="34" rx="1.5" fill="#6366f1"/>
+      <text x="24" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="13" font-weight="600" fill="#f8fafc">👤 users</text>
+      <text x="165" y="62" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#94a3b8">12.4k</text>
+
+      <!-- Table: orders -->
+      <rect x="8" y="78" width="204" height="34" rx="6" fill="transparent"/>
+      <text x="24" y="100" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="13" fill="#cbd5e1">📦 orders</text>
+      <text x="165" y="100" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#64748b">48.1k</text>
+
+      <!-- Table: products -->
+      <rect x="8" y="116" width="204" height="34" rx="6" fill="transparent"/>
+      <text x="24" y="138" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="13" fill="#cbd5e1">🏷️ products</text>
+      <text x="175" y="138" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#64748b">850</text>
+
+      <!-- Table: order_items -->
+      <rect x="8" y="154" width="204" height="34" rx="6" fill="transparent"/>
+      <text x="24" y="176" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="13" fill="#cbd5e1">🛒 order_items</text>
+      <text x="162" y="176" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#64748b">142k</text>
+
+      <!-- Views / Pragma Section -->
+      <text x="16" y="230" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="11" font-weight="700" fill="#64748b" letter-spacing="0.5">METRICS & PRAGMA</text>
+      <text x="24" y="258" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="12" fill="#94a3b8">Page Size: <tspan fill="#f1f5f9" font-family="JetBrains Mono">4096 B</tspan></text>
+      <text x="24" y="280" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="12" fill="#94a3b8">Journal Mode: <tspan fill="#38bdf8" font-family="JetBrains Mono">WAL</tspan></text>
+      <text x="24" y="302" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="12" fill="#94a3b8">Integrity: <tspan fill="#34d399" font-family="JetBrains Mono">OK</tspan></text>
+      <text x="24" y="324" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="12" fill="#94a3b8">Engine: <tspan fill="#a78bfa" font-family="JetBrains Mono">SQLite 3.45</tspan></text>
+    </g>
+
+    <!-- ==================== MAIN CONTENT AREA ==================== -->
+    <g transform="translate(220, 44)">
+      <!-- Tab Header Bar -->
+      <rect width="860" height="42" fill="#0d1424" stroke="#1e293b" stroke-width="1"/>
+
+      <!-- Tab: Visual ERD (Active) -->
+      <rect x="16" y="8" width="130" height="34" rx="6" fill="#1e293b" stroke="#334155" stroke-width="0.8"/>
+      <text x="32" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="12" font-weight="600" fill="#60a5fa">🕸️ Visual ERD</text>
+
+      <!-- Tab: Data Grid -->
+      <text x="170" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="12" font-weight="500" fill="#94a3b8">📊 Data Grid</text>
+
+      <!-- Tab: SQL Console -->
+      <text x="270" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="12" font-weight="500" fill="#94a3b8">⚡ SQL Console</text>
+
+      <!-- Tab: Diagnostics -->
+      <text x="390" y="30" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="12" font-weight="500" fill="#94a3b8">📈 Diagnostics</text>
+
+      <!-- Action buttons -->
+      <g transform="translate(680, 8)">
+        <rect width="80" height="26" rx="5" fill="#1e293b" stroke="#334155" stroke-width="0.8"/>
+        <text x="14" y="17" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="11" fill="#cbd5e1">Export CSV</text>
+
+        <rect x="88" width="80" height="26" rx="5" fill="#6366f1"/>
+        <text x="100" y="17" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="11" font-weight="600" fill="#ffffff">Run Query</text>
+      </g>
+
+      <!-- ERD Canvas & Interactive Graph Representation -->
+      <g transform="translate(20, 60)">
+        
+        <!-- SVG RELATIONSHIP CABLES (Bézier Curves) -->
+        <!-- users.id -> orders.user_id -->
+        <path d="M 230 75 C 290 75, 310 115, 370 115" stroke="url(#bezierGrad)" stroke-width="2.5" fill="none" opacity="0.9"/>
+        <circle cx="230" cy="75" r="4" fill="#6366f1"/>
+        <circle cx="370" cy="115" r="4" fill="#38bdf8"/>
+
+        <!-- orders.id -> order_items.order_id -->
+        <path d="M 590 75 C 640 75, 630 195, 680 195" stroke="#8b5cf6" stroke-width="2.2" stroke-dasharray="4,4" fill="none" opacity="0.8"/>
+        <circle cx="590" cy="75" r="3.5" fill="#8b5cf6"/>
+        <circle cx="680" cy="195" r="3.5" fill="#8b5cf6"/>
+
+        <!-- products.id -> order_items.product_id -->
+        <path d="M 590 285 C 640 285, 630 235, 680 235" stroke="#10b981" stroke-width="2.2" fill="none" opacity="0.8"/>
+        <circle cx="590" cy="285" r="3.5" fill="#10b981"/>
+        <circle cx="680" cy="235" r="3.5" fill="#10b981"/>
+
+        <!-- TABLE CARD 1: users -->
+        <g transform="translate(10, 20)">
+          <rect width="220" height="175" rx="8" fill="#131c2e" stroke="#6366f1" stroke-width="1.5" filter="url(#glowFilter)"/>
+          <rect width="220" height="175" rx="8" fill="#131c2e"/>
+          
+          <!-- Card Header -->
+          <rect width="220" height="32" rx="8" fill="#1e1b4b"/>
+          <rect y="22" width="220" height="10" fill="#1e1b4b"/>
+          <text x="12" y="21" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="12" font-weight="700" fill="#e0e7ff">👤 users</text>
+          <text x="175" y="21" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#a5b4fc">table</text>
+
+          <!-- Fields -->
+          <!-- Row 1: id (PK) -->
+          <text x="12" y="55" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" font-weight="600" fill="#38bdf8">🔑 id</text>
+          <text x="145" y="55" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#64748b">INTEGER</text>
+
+          <!-- Row 2: email -->
+          <text x="12" y="80" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" fill="#cbd5e1">email</text>
+          <text x="165" y="80" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#64748b">TEXT</text>
+
+          <!-- Row 3: full_name -->
+          <text x="12" y="105" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" fill="#cbd5e1">full_name</text>
+          <text x="165" y="105" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#64748b">TEXT</text>
+
+          <!-- Row 4: created_at -->
+          <text x="12" y="130" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" fill="#94a3b8">created_at</text>
+          <text x="145" y="130" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#64748b">DATETIME</text>
+
+          <line x1="8" y1="145" x2="212" y2="145" stroke="#1e293b" stroke-width="1"/>
+          <text x="12" y="162" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="10" fill="#64748b">Rows: 12,450 • Size: 840 KB</text>
+        </g>
+
+        <!-- TABLE CARD 2: orders -->
+        <g transform="translate(370, 20)">
+          <rect width="220" height="195" rx="8" fill="#131c2e" stroke="#3b82f6" stroke-width="1.2"/>
+          
+          <!-- Card Header -->
+          <rect width="220" height="32" rx="8" fill="#1e293b"/>
+          <rect y="22" width="220" height="10" fill="#1e293b"/>
+          <text x="12" y="21" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="12" font-weight="700" fill="#f8fafc">📦 orders</text>
+          <text x="175" y="21" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#93c5fd">table</text>
+
+          <!-- Fields -->
+          <text x="12" y="55" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" font-weight="600" fill="#38bdf8">🔑 id</text>
+          <text x="145" y="55" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#64748b">INTEGER</text>
+
+          <text x="12" y="80" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" font-weight="600" fill="#818cf8">🔗 user_id</text>
+          <text x="145" y="80" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#64748b">INTEGER</text>
+
+          <text x="12" y="105" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" fill="#cbd5e1">total_amount</text>
+          <text x="165" y="105" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#64748b">REAL</text>
+
+          <text x="12" y="130" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" fill="#cbd5e1">status</text>
+          <text x="165" y="130" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#64748b">TEXT</text>
+
+          <text x="12" y="155" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" fill="#94a3b8">created_at</text>
+          <text x="145" y="155" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#64748b">DATETIME</text>
+
+          <line x1="8" y1="168" x2="212" y2="168" stroke="#1e293b" stroke-width="1"/>
+          <text x="12" y="184" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="10" fill="#64748b">Rows: 48,120 • 3 Foreign Keys</text>
+        </g>
+
+        <!-- TABLE CARD 3: products -->
+        <g transform="translate(370, 235)">
+          <rect width="220" height="150" rx="8" fill="#131c2e" stroke="#10b981" stroke-width="1.2"/>
+          <rect width="220" height="30" rx="8" fill="#064e3b" fill-opacity="0.4"/>
+          <rect y="20" width="220" height="10" fill="#064e3b" fill-opacity="0.4"/>
+          <text x="12" y="20" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="12" font-weight="700" fill="#a7f3d0">🏷️ products</text>
+          
+          <text x="12" y="50" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" font-weight="600" fill="#38bdf8">🔑 id</text>
+          <text x="145" y="50" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#64748b">INTEGER</text>
+
+          <text x="12" y="75" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" fill="#cbd5e1">title</text>
+          <text x="165" y="75" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#64748b">TEXT</text>
+
+          <text x="12" y="100" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" fill="#cbd5e1">price</text>
+          <text x="165" y="100" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#64748b">REAL</text>
+
+          <line x1="8" y1="120" x2="212" y2="120" stroke="#1e293b" stroke-width="1"/>
+          <text x="12" y="136" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="10" fill="#64748b">Rows: 850 • In Stock</text>
+        </g>
+
+        <!-- TABLE CARD 4: order_items -->
+        <g transform="translate(680, 140)">
+          <rect width="140" height="160" rx="8" fill="#131c2e" stroke="#334155" stroke-width="1"/>
+          <rect width="140" height="28" rx="8" fill="#1e293b"/>
+          <rect y="18" width="140" height="10" fill="#1e293b"/>
+          <text x="10" y="18" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="11" font-weight="700" fill="#f1f5f9">🛒 order_items</text>
+
+          <text x="10" y="46" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#38bdf8">🔑 id</text>
+          <text x="10" y="68" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#818cf8">🔗 order_id</text>
+          <text x="10" y="90" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#10b981">🔗 product_id</text>
+          <text x="10" y="112" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#cbd5e1">quantity</text>
+          <text x="10" y="134" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" fill="#cbd5e1">unit_price</text>
+        </g>
+
+        <!-- INLINE QUERY SNIPPET / EXECUTION PILL AT BOTTOM RIGHT -->
+        <g transform="translate(10, 220)">
+          <rect width="320" height="165" rx="8" fill="#090d16" stroke="#1e293b" stroke-width="1"/>
+          <rect width="320" height="26" rx="8" fill="#111827"/>
+          <rect y="18" width="320" height="8" fill="#111827"/>
+          <text x="12" y="17" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" font-weight="600" fill="#94a3b8">⚡ SQL Console</text>
+          
+          <!-- Code -->
+          <text x="12" y="50" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" fill="#ec4899">SELECT <tspan fill="#f8fafc">u.email, COUNT(o.id) AS orders</tspan></text>
+          <text x="12" y="70" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" fill="#ec4899">FROM <tspan fill="#f8fafc">users u</tspan></text>
+          <text x="12" y="90" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" fill="#ec4899">LEFT JOIN <tspan fill="#f8fafc">orders o ON u.id = o.user_id</tspan></text>
+          <text x="12" y="110" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="11" fill="#ec4899">GROUP BY <tspan fill="#f8fafc">u.id ORDER BY orders DESC LIMIT 10;</tspan></text>
+
+          <line x1="8" y1="126" x2="312" y2="126" stroke="#1e293b" stroke-width="1"/>
+
+          <!-- Status Result Pill -->
+          <rect x="12" y="134" width="296" height="22" rx="4" fill="#064e3b" fill-opacity="0.3" stroke="#059669" stroke-width="0.8"/>
+          <text x="22" y="149" font-family="-apple-system, BlinkMacSystemFont, 'JetBrains Mono', monospace" font-size="10" font-weight="600" fill="#34d399">✓ 10 rows returned in 0.38ms (WASM)</text>
+        </g>
+
+      </g>
+    </g>
+
+    <!-- STATUS BAR AT BOTTOM -->
+    <g transform="translate(0, 570)">
+      <rect width="1080" height="30" fill="#0b1120" stroke="#1e293b" stroke-width="1"/>
+      <circle cx="20" cy="15" r="4" fill="#10b981"/>
+      <text x="32" y="19" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="11" fill="#94a3b8">Ready • UTF-8 • In-Memory DB</text>
+      <text x="910" y="19" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-size="11" fill="#64748b">SQLite 3.x (WebAssembly)</text>
+    </g>
+
+  </g>
+</svg>
