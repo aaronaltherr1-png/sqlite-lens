@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SQLiteLens Studio — Professional SQLite Database Workbench</title>
-  <meta name="description" content="Professional desktop-grade SQLite workbench running 100% in-browser via WebAssembly. Interactive visual ERD, high-performance data grid, and SQL query studio.">
+  <title>SQLiteLens Studio — Pro In-Browser SQLite Workbench & Visual ERD</title>
+  <meta name="description" content="Desktop-grade SQLite workbench running 100% in-browser via WebAssembly. Full CRUD data grid, interactive visual ERD, multi-tab SQL studio, schema profiler, and binary .sqlite export.">
   
   <!-- Modern Typography: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Relative paths for GitHub Pages compatibility -->
+  <!-- Stylesheet -->
   <link rel="stylesheet" href="./style.css">
   
   <!-- sql.js WebAssembly bridge -->
@@ -21,18 +21,22 @@
 
   <!-- Fullscreen Drag & Drop Overlay -->
   <div id="drag-overlay" class="drag-overlay">
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-      <polyline points="17 8 12 3 7 8"></polyline>
-      <line x1="12" y1="3" x2="12" y2="15"></line>
-    </svg>
-    <div style="font-size: 1.4rem; font-weight: 700;">Drop your SQLite database file here</div>
-    <div style="font-size: 0.9rem; opacity: 0.9;">Loads instantly in local memory (100% private)</div>
+    <div class="drag-overlay-box">
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="17 8 12 3 7 8"></polyline>
+        <line x1="12" y1="3" x2="12" y2="15"></line>
+      </svg>
+      <div style="font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em;">Drop SQLite DB, CSV, or JSON file</div>
+      <div style="font-size: 0.9rem; opacity: 0.85;">Mounts instantly in local WebAssembly memory (100% private)</div>
+    </div>
   </div>
 
   <div class="window-container">
     
-    <!-- Desktop Application Titlebar -->
+    <!-- =======================================================================
+         DESKTOP APPLICATION TITLEBAR
+         ======================================================================= -->
     <header class="titlebar">
       <div class="titlebar-left">
         <!-- macOS traffic lights -->
@@ -42,16 +46,16 @@
           <span class="window-dot dot-maximize"></span>
         </div>
 
-        <div class="brand-badge" id="brand-home-btn" title="Go to Start Page">
+        <div class="brand-badge" id="brand-home-btn" title="Return to Studio Launcher">
           <div class="brand-icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
               <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
               <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
               <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
             </svg>
           </div>
           <span>SQLiteLens</span>
-          <span style="font-size: 0.65rem; padding: 2px 5px; border-radius: 4px; background: rgba(99,102,241,0.2); color: var(--accent-cyan); font-weight: 700;">STUDIO PRO</span>
+          <span class="pro-version-pill">STUDIO 2.0</span>
         </div>
 
         <div class="titlebar-divider"></div>
@@ -60,44 +64,65 @@
         <div class="cluster-pill" id="active-db-pill">
           <span class="cluster-dot"></span>
           <span id="active-db-name" style="font-weight: 600; color: var(--text-primary);">Start Page</span>
-          <span id="active-db-size" style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted);">Launcher</span>
+          <span id="active-db-size" style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted);">Launcher</span>
+          <span id="active-db-modified-badge" class="modified-pill" style="display: none;">MODIFIED</span>
         </div>
       </div>
 
       <!-- Center Omnibar / Command Palette Trigger -->
       <div class="titlebar-center">
-        <button id="btn-open-palette" class="omni-search-btn" title="Open Command Palette (Ctrl+K)">
+        <button id="btn-open-palette" class="omni-search-btn" title="Open Command Palette (Ctrl+K / ⌘K)">
           <div style="display: flex; align-items: center; gap: 8px;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <span>Jump to table, query, or command...</span>
+            <span>Search tables, run commands, switch views...</span>
           </div>
-          <span class="kbd-shortcut">Ctrl K</span>
+          <span class="kbd-shortcut">⌘K</span>
         </button>
       </div>
 
       <!-- Right Window Actions -->
       <div class="titlebar-right">
-        <input type="file" id="file-picker-input" accept=".db,.sqlite,.sqlite3" style="display: none;">
+        <input type="file" id="file-picker-input" accept=".db,.sqlite,.sqlite3,.db3" style="display: none;">
+        <input type="file" id="dataset-picker-input" accept=".csv,.json" style="display: none;">
         
-        <button id="btn-import-file" class="btn btn-secondary btn-sm" title="Open SQLite Database from disk">
+        <button id="btn-import-file" class="btn btn-secondary btn-sm" title="Open SQLite Database file (.db, .sqlite)">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="17 8 12 3 7 8"></polyline>
             <line x1="12" y1="3" x2="12" y2="15"></line>
           </svg>
-          Open File
+          <span>Open DB</span>
         </button>
 
-        <button id="btn-export-dump" class="btn btn-secondary btn-sm" style="display: none;" title="Export full SQL schema and data dump">
+        <button id="btn-import-dataset" class="btn btn-secondary btn-sm" title="Import CSV or JSON file as a new SQLite table">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="12" y1="18" x2="12" y2="12"></line>
+            <line x1="9" y1="15" x2="15" y2="15"></line>
+          </svg>
+          <span>Import CSV/JSON</span>
+        </button>
+
+        <button id="btn-save-binary" class="btn btn-primary btn-sm" style="display: none;" title="Download binary .sqlite database file with all changes">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+            <polyline points="7 3 7 8 15 8"></polyline>
+          </svg>
+          <span>Save .sqlite</span>
+        </button>
+
+        <button id="btn-export-dump" class="btn btn-secondary btn-sm" style="display: none;" title="Export full SQL schema and data dump (.sql)">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
           </svg>
-          SQL Dump
+          <span>SQL Dump</span>
         </button>
 
         <div class="titlebar-divider"></div>
@@ -118,30 +143,29 @@
         </button>
 
         <!-- GitHub Repo Star Link -->
-        <a href="https://github.com/aaronaltherr1-png/sqlite-lens" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" title="Star on GitHub">
+        <a href="https://github.com/aaronaltherr1-png/sqlite-lens" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" title="View & Star on GitHub">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
           </svg>
-          <span>Star</span>
+          <span>GitHub</span>
         </a>
       </div>
     </header>
 
     <!-- =======================================================================
-         VIEW 1: START PAGE / STUDIO LAUNCHER (The Pro Software Splash Hub)
+         VIEW 1: START PAGE / STUDIO LAUNCHER
          ======================================================================= -->
     <main id="launcher-view" class="launcher-view">
       <div class="launcher-hero">
         <div class="launcher-badge">
-          <span>✨</span>
-          <span>DESKTOP WORKBENCH • PRO EDITION</span>
+          <span class="pulse-dot"></span>
+          <span>SQLITELENS STUDIO 2.0 • WASM WORKBENCH</span>
         </div>
         <h1 class="launcher-title">
-          Modern, Private SQLite Studio in Your Browser.
+          Desktop-Grade SQLite Workbench.<br>Zero Install. 100% Client-Side.
         </h1>
         <p class="launcher-subtitle">
-          Inspect schemas, generate interactive visual ERDs, write queries with execution timers, and export data. 
-          100% in-memory WebAssembly engine. Zero cloud telemetry.
+          Inspect &amp; edit tables inline, explore interactive visual ERDs, run multi-tab SQL queries with sub-millisecond profiling, and export modified binary <code>.sqlite</code> files — directly in browser memory.
         </p>
       </div>
 
@@ -151,33 +175,37 @@
         <!-- Left: Dropzone Card -->
         <div class="launcher-dropzone-card" id="launcher-dropzone">
           <div class="dropzone-icon-box">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="17 8 12 3 7 8"></polyline>
               <line x1="12" y1="3" x2="12" y2="15"></line>
             </svg>
           </div>
           <div>
-            <div class="dropzone-head">Mount Local Database</div>
-            <div class="dropzone-desc">Drop any .db, .sqlite, or .sqlite3 file here, or click to browse files on your computer.</div>
+            <div class="dropzone-head">Mount Local SQLite Database</div>
+            <div class="dropzone-desc">Drop any <code>.db</code>, <code>.sqlite</code>, <code>.sqlite3</code>, <code>.csv</code>, or <code>.json</code> file here, or click to browse your machine.</div>
+          </div>
+          <div class="dropzone-actions-row">
+            <button class="btn btn-primary btn-sm" type="button">Browse Database File</button>
+            <button class="btn btn-secondary btn-sm" type="button" id="btn-launcher-csv">Import CSV / JSON</button>
           </div>
           <div class="dropzone-security-pill">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
-            <span>100% In-Memory Sandbox • No Server Uploads</span>
+            <span>100% Local In-Memory WebAssembly • Zero Bytes Leave Your Device</span>
           </div>
         </div>
 
         <!-- Right: Sample Workspaces -->
         <div class="launcher-workspaces-card">
           <div class="workspace-card-title">
-            <span>Instant Workspaces</span>
-            <span style="color: var(--accent-cyan); font-size: 0.68rem;">1-CLICK DEMO</span>
+            <span>Instant Demo Clusters</span>
+            <span style="color: var(--accent-cyan); font-size: 0.68rem;">1-CLICK LIVE MOUNT</span>
           </div>
 
-          <!-- Workspace A -->
+          <!-- Workspace A: SaaS -->
           <div class="launcher-sample-item" id="launch-saas">
             <div class="sample-item-info">
               <div class="sample-item-name">
@@ -185,18 +213,18 @@
                 <span>SaaS Cloud Production Cluster</span>
               </div>
               <div class="sample-item-desc">
-                Organizations, user roles, active subscriptions, API keys, invoices, and audit telemetry.
+                Organizations, multi-tenant users, active subscriptions, API keys, invoices, and audit logs.
               </div>
               <div class="sample-item-tags">
                 <span class="sample-pill">6 tables</span>
-                <span class="sample-pill">1,420 rows</span>
                 <span class="sample-pill">Foreign Keys</span>
+                <span class="sample-pill">Visual ERD</span>
               </div>
             </div>
             <button class="btn btn-primary btn-sm">Launch →</button>
           </div>
 
-          <!-- Workspace B -->
+          <!-- Workspace B: E-Commerce -->
           <div class="launcher-sample-item" id="launch-ecom">
             <div class="sample-item-info">
               <div class="sample-item-name">
@@ -204,26 +232,44 @@
                 <span>Global E-Commerce Store</span>
               </div>
               <div class="sample-item-desc">
-                Product catalog, customer lifetime values, order fulfillment, and relational categories.
+                Product inventory, customer profiles, order fulfillment items, reviews, and category trees.
               </div>
               <div class="sample-item-tags">
                 <span class="sample-pill">5 tables</span>
-                <span class="sample-pill">850 rows</span>
-                <span class="sample-pill">Relational ERD</span>
+                <span class="sample-pill">Relational Schema</span>
+                <span class="sample-pill">Analytics Ready</span>
               </div>
             </div>
             <button class="btn btn-secondary btn-sm">Launch →</button>
           </div>
 
-          <!-- Workspace C: Scratchpad -->
+          <!-- Workspace C: Analytics -->
+          <div class="launcher-sample-item" id="launch-analytics">
+            <div class="sample-item-info">
+              <div class="sample-item-name">
+                <span>📈</span>
+                <span>Telemetry &amp; Event Analytics</span>
+              </div>
+              <div class="sample-item-desc">
+                Web sessions, pageviews, conversion funnels, and performance metrics dataset.
+              </div>
+              <div class="sample-item-tags">
+                <span class="sample-pill">Time-Series</span>
+                <span class="sample-pill">SQL Profiling</span>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-sm">Launch →</button>
+          </div>
+
+          <!-- Workspace D: Scratchpad -->
           <div class="launcher-sample-item" id="launch-blank">
             <div class="sample-item-info">
               <div class="sample-item-name">
-                <span>📝</span>
-                <span>In-Memory Scratchpad DB</span>
+                <span>🧪</span>
+                <span>In-Memory SQL Scratchpad</span>
               </div>
               <div class="sample-item-desc">
-                Empty sandbox database to create tables and run scratchpad queries.
+                Clean sandbox database to prototype schemas, import CSVs, and test complex queries.
               </div>
             </div>
             <button class="btn btn-ghost btn-sm">Create →</button>
@@ -235,21 +281,27 @@
       <!-- Launcher Features Showcase -->
       <div class="launcher-features-grid">
         <div class="feature-tile">
+          <div class="feature-tile-icon">✏️</div>
+          <div class="feature-tile-title">Full Inline CRUD &amp; Binary Save</div>
+          <div class="feature-tile-desc">Edit cells inline, insert or delete rows, create tables, and export the modified binary <code>.sqlite</code> database file.</div>
+        </div>
+
+        <div class="feature-tile">
           <div class="feature-tile-icon">🕸️</div>
-          <div class="feature-tile-title">Interactive Visual ERD</div>
-          <div class="feature-tile-desc">Automatic schema graph with draggable table cards and dynamic SVG Bézier relation lines.</div>
+          <div class="feature-tile-title">Infinite-Canvas Visual ERD</div>
+          <div class="feature-tile-desc">Topological auto-layout, interactive SVG Bézier relationship cables, pan/zoom, and 1-click SVG diagram export.</div>
         </div>
 
         <div class="feature-tile">
           <div class="feature-tile-icon">⚡</div>
-          <div class="feature-tile-title">Sub-Millisecond SQL Studio</div>
-          <div class="feature-tile-desc">Full query editor with keyboard execution (Ctrl+Enter), EXPLAIN bytecode analysis, and timers.</div>
+          <div class="feature-tile-title">Multi-Tab SQL Studio</div>
+          <div class="feature-tile-desc">Line-numbered SQL editor, SQL formatter, execution history log, <code>EXPLAIN QUERY PLAN</code>, and Markdown/CSV exports.</div>
         </div>
 
         <div class="feature-tile">
-          <div class="feature-tile-icon">⌨️</div>
-          <div class="feature-tile-title">Command Palette (Ctrl+K)</div>
-          <div class="feature-tile-desc">Raycast-style spotlight search to jump to tables, run commands, or toggle modes instantly.</div>
+          <div class="feature-tile-icon">🔬</div>
+          <div class="feature-tile-title">Column Data Profiler</div>
+          <div class="feature-tile-desc">Inspect column cardinality, null distribution, min/max bounds, top values, and run <code>PRAGMA integrity_check</code>.</div>
         </div>
       </div>
     </main>
@@ -273,7 +325,8 @@
 
           <button class="mode-tab-btn" data-tab="query" id="mode-tab-query">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
             </svg>
             <span>SQL Studio</span>
           </button>
@@ -286,7 +339,17 @@
               <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
               <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
             </svg>
-            <span>Interactive ERD</span>
+            <span>Visual ERD</span>
+          </button>
+
+          <button class="mode-tab-btn" data-tab="schema" id="mode-tab-schema">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>Schema &amp; DDL</span>
           </button>
 
           <button class="mode-tab-btn" data-tab="insights" id="mode-tab-insights">
@@ -295,15 +358,18 @@
               <line x1="12" y1="20" x2="12" y2="4"></line>
               <line x1="6" y1="20" x2="6" y2="14"></line>
             </svg>
-            <span>Insights & Health</span>
+            <span>Profiler &amp; Health</span>
           </button>
         </div>
 
         <div class="studio-actions-right">
-          <button id="btn-return-launcher" class="btn btn-ghost btn-sm" title="Return to Start Page">
-            ← Start Page
+          <button id="btn-new-table-modal" class="btn btn-secondary btn-sm" title="Create a new table in this database">
+            <span>+ New Table</span>
           </button>
-          <span id="active-table-meta-text" style="font-size: 0.775rem; color: var(--text-muted); font-family: var(--font-mono);">Ready</span>
+          <button id="btn-return-launcher" class="btn btn-ghost btn-sm" title="Return to Start Page">
+            ← Launcher
+          </button>
+          <span id="active-table-meta-text" class="meta-status-pill">Ready</span>
         </div>
       </nav>
 
@@ -314,24 +380,32 @@
         <aside class="studio-sidebar">
           <div class="sidebar-connections">
             <div class="sidebar-title">
-              <span>Workspaces</span>
+              <span>Demo Clusters</span>
               <button id="btn-sidebar-home" class="btn btn-ghost btn-sm" style="padding: 1px 6px; font-size: 0.65rem;">Home</button>
             </div>
             
             <div class="connection-item active" id="conn-saas">
               <div class="connection-name">
                 <span>⚡</span>
-                <span>SaaS Production DB</span>
+                <span>SaaS Production</span>
               </div>
-              <span style="font-size: 0.7rem; color: var(--text-muted);">6 tables</span>
+              <span class="conn-meta-tag">6 tbl</span>
             </div>
 
             <div class="connection-item" id="conn-ecom">
               <div class="connection-name">
                 <span>🛒</span>
-                <span>E-Commerce Cloud</span>
+                <span>E-Commerce Store</span>
               </div>
-              <span style="font-size: 0.7rem; color: var(--text-muted);">5 tables</span>
+              <span class="conn-meta-tag">5 tbl</span>
+            </div>
+
+            <div class="connection-item" id="conn-analytics">
+              <div class="connection-name">
+                <span>📈</span>
+                <span>Event Analytics</span>
+              </div>
+              <span class="conn-meta-tag">Demo</span>
             </div>
           </div>
 
@@ -339,19 +413,27 @@
           <div class="sidebar-tree-container">
             <div>
               <div class="sidebar-title">
-                <span>Tables & Entities</span>
-                <span id="sidebar-tables-count">0</span>
+                <span>Tables</span>
+                <span id="sidebar-tables-count" class="sidebar-count-pill">0</span>
               </div>
-              <input type="text" id="sidebar-filter-input" class="input-search" placeholder="Filter tables (Ctrl+K)..." style="width: 100%; margin-bottom: 8px;">
+              <input type="text" id="sidebar-filter-input" class="input-search" placeholder="Filter tables..." style="width: 100%; margin-bottom: 8px;">
               <ul class="table-list" id="sidebar-tables-list"></ul>
             </div>
 
             <div id="sidebar-views-block" style="display: none;">
               <div class="sidebar-title">
                 <span>Views</span>
-                <span id="sidebar-views-count">0</span>
+                <span id="sidebar-views-count" class="sidebar-count-pill">0</span>
               </div>
               <ul class="table-list" id="sidebar-views-list"></ul>
+            </div>
+
+            <div id="sidebar-indexes-block" style="display: none;">
+              <div class="sidebar-title">
+                <span>Indexes</span>
+                <span id="sidebar-indexes-count" class="sidebar-count-pill">0</span>
+              </div>
+              <ul class="table-list" id="sidebar-indexes-list"></ul>
             </div>
           </div>
         </aside>
@@ -359,12 +441,14 @@
         <!-- Central View Content -->
         <main class="studio-content">
           
-          <!-- View 1: Data Grid -->
+          <!-- =================================================================
+               PANEL 1: DATA GRID (Full CRUD, Smart Types, FK Jump)
+               ================================================================= -->
           <section id="panel-grid" class="view-panel active">
             <div class="grid-toolbar">
               <div class="grid-toolbar-left">
                 <span class="table-header-title" id="grid-table-title">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                     <line x1="3" y1="9" x2="21" y2="9"></line>
                     <line x1="9" y1="21" x2="9" y2="9"></line>
@@ -372,13 +456,26 @@
                   <span id="grid-active-table-name">table_name</span>
                 </span>
                 <span id="grid-row-count-badge" class="table-badge-rows">0 rows</span>
+                <button id="btn-insert-row" class="btn btn-primary btn-sm" title="Insert a new row into this table">
+                  <span>+ Insert Row</span>
+                </button>
+                <button id="btn-view-table-ddl" class="btn btn-secondary btn-sm" title="Inspect Table Schema & DDL">
+                  <span>Schema / DDL</span>
+                </button>
               </div>
 
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <input type="text" id="grid-search-filter" class="input-search" placeholder="Filter rows in realtime..." style="width: 200px;">
-                <button id="btn-grid-export-csv" class="btn btn-secondary btn-sm" title="Export table to CSV">CSV</button>
-                <button id="btn-grid-export-json" class="btn btn-secondary btn-sm" title="Export table to JSON">JSON</button>
-                <button id="btn-grid-refresh" class="btn btn-ghost btn-sm" title="Reload Table">
+              <div class="grid-toolbar-right">
+                <input type="text" id="grid-search-filter" class="input-search" placeholder="Search across all columns..." style="width: 210px;">
+                <select id="grid-page-size-select" class="input-select" title="Rows per page">
+                  <option value="25">25 / page</option>
+                  <option value="50" selected>50 / page</option>
+                  <option value="100">100 / page</option>
+                  <option value="250">250 / page</option>
+                </select>
+                <button id="btn-grid-copy-md" class="btn btn-secondary btn-sm" title="Copy current page as Markdown table">MD</button>
+                <button id="btn-grid-export-csv" class="btn btn-secondary btn-sm" title="Export entire table to CSV">CSV</button>
+                <button id="btn-grid-export-json" class="btn btn-secondary btn-sm" title="Export entire table to JSON">JSON</button>
+                <button id="btn-grid-refresh" class="btn btn-ghost btn-sm" title="Refresh Table Data">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M23 4v6h-6"></path>
                     <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
@@ -395,41 +492,76 @@
             </div>
 
             <div class="grid-pagination-bar">
-              <div id="grid-pagination-label">Showing rows 1-50</div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span id="grid-pagination-label">Showing rows 1-50</span>
+                <span style="color: var(--text-faint); font-size: 0.72rem;">💡 Click any cell to inspect/edit • Double-click for inline edit • Click 🔗 FK to jump</span>
+              </div>
               <div style="display: flex; align-items: center; gap: 6px;">
-                <button id="btn-grid-prev" class="btn btn-secondary btn-sm">Prev</button>
-                <span id="grid-pagination-page" style="font-weight: 600; padding: 0 6px;">1 / 1</span>
-                <button id="btn-grid-next" class="btn btn-secondary btn-sm">Next</button>
+                <button id="btn-grid-prev" class="btn btn-secondary btn-sm">← Prev</button>
+                <span id="grid-pagination-page" style="font-weight: 600; font-family: var(--font-mono); padding: 0 8px;">1 / 1</span>
+                <button id="btn-grid-next" class="btn btn-secondary btn-sm">Next →</button>
               </div>
             </div>
           </section>
 
-          <!-- View 2: SQL Studio -->
+          <!-- =================================================================
+               PANEL 2: SQL STUDIO (Multi-Tab, Line Numbers, Formatter, History)
+               ================================================================= -->
           <section id="panel-query" class="view-panel">
             <div class="query-workspace">
+              <!-- Multi-Tab Query Bar -->
+              <div class="sql-tabs-header">
+                <div class="sql-tabs-list" id="sql-tabs-list"></div>
+                <button id="btn-add-sql-tab" class="btn btn-ghost btn-sm" title="New Query Tab">+ Tab</button>
+              </div>
+
               <div class="query-editor-card">
                 <div class="query-editor-header">
                   <div class="query-quick-templates" id="query-quick-templates">
                     <span style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700;">SNIPPETS:</span>
                   </div>
-                  <div style="display: flex; gap: 6px;">
-                    <button id="btn-query-explain" class="btn btn-secondary btn-sm">Explain Plan</button>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <button id="btn-format-sql" class="btn btn-secondary btn-sm" title="Beautify & Format SQL">Format SQL</button>
+                    <button id="btn-query-explain" class="btn btn-secondary btn-sm" title="Run EXPLAIN QUERY PLAN">Explain Plan</button>
+                    <button id="btn-query-history-toggle" class="btn btn-secondary btn-sm" title="Toggle Execution History">History</button>
                     <button id="btn-query-run" class="btn btn-primary btn-sm">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
                         <polygon points="5 3 19 12 5 21 5 3"></polygon>
                       </svg>
-                      Run Query (Ctrl+Enter)
+                      <span>Run (Ctrl+Enter)</span>
                     </button>
                   </div>
                 </div>
-                <textarea id="sql-editor-input" class="query-textarea" spellcheck="false" placeholder="Write your SQL query..."></textarea>
+
+                <div class="sql-editor-body">
+                  <div class="sql-editor-container">
+                    <div id="sql-line-numbers" class="sql-line-numbers">1</div>
+                    <textarea id="sql-editor-input" class="query-textarea" spellcheck="false" placeholder="Write SQL queries here... (Ctrl+Enter to execute)"></textarea>
+                  </div>
+
+                  <!-- Collapsible Query History Drawer -->
+                  <aside id="query-history-panel" class="query-history-panel" style="display: none;">
+                    <div class="query-history-head">
+                      <span>Execution History</span>
+                      <button id="btn-clear-history" class="btn btn-ghost btn-sm" style="font-size: 0.68rem;">Clear</button>
+                    </div>
+                    <ul id="query-history-list" class="query-history-list"></ul>
+                  </aside>
+                </div>
               </div>
 
               <div class="query-metrics-bar">
-                <div id="query-execution-status" style="color: var(--accent-emerald); font-family: var(--font-mono);">
-                  Console Ready
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div id="query-execution-status" style="color: var(--accent-emerald); font-family: var(--font-mono);">
+                    Console Ready
+                  </div>
+                  <div id="query-result-sets-tabs" style="display: flex; gap: 4px;"></div>
                 </div>
-                <button id="btn-query-export-csv" class="btn btn-ghost btn-sm" style="display: none;">Export Results CSV</button>
+                <div style="display: flex; gap: 6px;">
+                  <button id="btn-query-copy-md" class="btn btn-secondary btn-sm" style="display: none;">Copy Markdown</button>
+                  <button id="btn-query-export-json" class="btn btn-secondary btn-sm" style="display: none;">Export JSON</button>
+                  <button id="btn-query-export-csv" class="btn btn-secondary btn-sm" style="display: none;">Export CSV</button>
+                </div>
               </div>
 
               <div class="query-results-viewport" id="query-results-viewport">
@@ -441,68 +573,132 @@
             </div>
           </section>
 
-          <!-- View 3: Interactive Visual ERD -->
+          <!-- =================================================================
+               PANEL 3: INTERACTIVE VISUAL ERD
+               ================================================================= -->
           <section id="panel-erd" class="view-panel">
             <div class="erd-studio-canvas" id="erd-studio-canvas">
               <div class="erd-floating-toolbar">
-                <button id="btn-erd-auto-layout" class="btn btn-secondary btn-sm">Auto Layout</button>
-                <button id="btn-erd-zoom-in" class="btn btn-secondary btn-sm">+</button>
-                <button id="btn-erd-zoom-out" class="btn btn-secondary btn-sm">-</button>
+                <span id="erd-relations-badge" class="erd-info-pill">0 tables</span>
+                <div class="titlebar-divider"></div>
+                <button id="btn-erd-auto-layout" class="btn btn-secondary btn-sm" title="Topological Auto-Layout">Auto Layout</button>
+                <button id="btn-erd-fit-view" class="btn btn-secondary btn-sm" title="Fit diagram to viewport">Fit View</button>
+                <button id="btn-erd-zoom-out" class="btn btn-secondary btn-sm" title="Zoom Out">−</button>
+                <span id="erd-zoom-badge" class="erd-zoom-label">100%</span>
+                <button id="btn-erd-zoom-in" class="btn btn-secondary btn-sm" title="Zoom In">+</button>
+                <div class="titlebar-divider"></div>
+                <button id="btn-erd-export-svg" class="btn btn-primary btn-sm" title="Download standalone SVG diagram">Export SVG</button>
               </div>
               <div class="erd-canvas-viewport" id="erd-canvas-viewport">
                 <svg class="erd-svg-layer" id="erd-svg-layer"></svg>
-                <div id="erd-nodes-container"></div>
+                <div id="erd-nodes-container" class="erd-nodes-container"></div>
               </div>
             </div>
           </section>
 
-          <!-- View 4: Insights & Diagnostics -->
-          <section id="panel-insights" class="view-panel">
+          <!-- =================================================================
+               PANEL 4: SCHEMA & DDL INSPECTOR
+               ================================================================= -->
+          <section id="panel-schema" class="view-panel">
             <div class="insights-scroll-area">
-              <div class="kpi-row">
-                <div class="kpi-box">
-                  <div class="kpi-label">Storage Allocated</div>
-                  <div class="kpi-number" id="kpi-storage">0 KB</div>
+              <div class="schema-header-card">
+                <div>
+                  <h2 id="schema-table-title" style="font-size: 1.2rem; font-weight: 800;">Table Schema</h2>
+                  <p id="schema-table-subtitle" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Column definitions, foreign key constraints, and SQL DDL statement.</p>
                 </div>
-                <div class="kpi-box">
-                  <div class="kpi-label">Active Tables</div>
-                  <div class="kpi-number" id="kpi-tables">0</div>
+                <div style="display: flex; gap: 8px;">
+                  <button id="btn-copy-ddl" class="btn btn-primary btn-sm">Copy CREATE TABLE SQL</button>
                 </div>
-                <div class="kpi-box">
-                  <div class="kpi-label">Total Rows</div>
-                  <div class="kpi-number" id="kpi-rows">0</div>
-                </div>
-                <div class="kpi-box">
-                  <div class="kpi-label">Indices & Constraints</div>
-                  <div class="kpi-number" id="kpi-indices">0</div>
+              </div>
+
+              <div class="insights-widget">
+                <div class="widget-title">Columns &amp; Data Types</div>
+                <div style="overflow-x: auto;">
+                  <table class="data-table" id="schema-columns-table">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Column Name</th>
+                        <th>Data Type</th>
+                        <th>Nullable</th>
+                        <th>Default Value</th>
+                        <th>Key / Constraint</th>
+                      </tr>
+                    </thead>
+                    <tbody id="schema-columns-body"></tbody>
+                  </table>
                 </div>
               </div>
 
               <div class="insights-split">
                 <div class="insights-widget">
-                  <div class="widget-title">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="18" y1="20" x2="18" y2="10"></line>
-                      <line x1="12" y1="20" x2="12" y2="4"></line>
-                      <line x1="6" y1="20" x2="6" y2="14"></line>
-                    </svg>
-                    Table Volume Distribution
-                  </div>
-                  <div id="insights-bar-chart" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                  <div class="widget-title">SQL DDL Definition</div>
+                  <pre id="schema-ddl-code" class="ddl-code-block"></pre>
                 </div>
 
                 <div class="insights-widget">
+                  <div class="widget-title">Indexes &amp; Triggers</div>
+                  <div id="schema-indexes-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- =================================================================
+               PANEL 5: PROFILER, INSIGHTS & DIAGNOSTICS
+               ================================================================= -->
+          <section id="panel-insights" class="view-panel">
+            <div class="insights-scroll-area">
+              <div class="kpi-row">
+                <div class="kpi-box">
+                  <div class="kpi-label">Database Footprint</div>
+                  <div class="kpi-number" id="kpi-storage">0 KB</div>
+                </div>
+                <div class="kpi-box">
+                  <div class="kpi-label">Tables &amp; Views</div>
+                  <div class="kpi-number" id="kpi-tables">0</div>
+                </div>
+                <div class="kpi-box">
+                  <div class="kpi-label">Total Records</div>
+                  <div class="kpi-number" id="kpi-rows">0</div>
+                </div>
+                <div class="kpi-box">
+                  <div class="kpi-label">Indexes &amp; Foreign Keys</div>
+                  <div class="kpi-number" id="kpi-indices">0</div>
+                </div>
+              </div>
+
+              <!-- Interactive Column Data Profiler -->
+              <div class="insights-widget">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
                   <div class="widget-title">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <circle cx="12" cy="12" r="3"></circle>
-                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                    </svg>
-                    Engine Telemetry & Pragmas
+                    <span>🔬 Column Data Quality &amp; Cardinality Profiler</span>
                   </div>
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    <select id="profiler-table-select" class="input-select"></select>
+                    <select id="profiler-col-select" class="input-select"></select>
+                  </div>
+                </div>
+                <div id="profiler-results-box" class="profiler-results-box"></div>
+              </div>
+
+              <div class="insights-split">
+                <div class="insights-widget">
+                  <div class="widget-title">Table Row Volume Distribution</div>
+                  <div id="insights-bar-chart" style="display: flex; flex-direction: column; gap: 12px;"></div>
+                </div>
+
+                <div class="insights-widget">
+                  <div class="widget-title">SQLite Engine Telemetry &amp; Pragmas</div>
                   <table class="kv-table" id="insights-pragma-kv"></table>
-                  <button id="btn-run-integrity-check" class="btn btn-secondary btn-sm" style="margin-top: 10px;">
-                    Execute PRAGMA integrity_check
-                  </button>
+                  <div style="display: flex; gap: 8px; margin-top: 10px;">
+                    <button id="btn-run-integrity-check" class="btn btn-secondary btn-sm" style="flex: 1;">
+                      PRAGMA integrity_check
+                    </button>
+                    <button id="btn-run-vacuum" class="btn btn-secondary btn-sm" style="flex: 1;">
+                      Execute VACUUM
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -516,16 +712,16 @@
         <div class="statusbar-left">
           <span class="status-indicator">
             <span class="cluster-dot"></span>
-            <span>WASM Engine: Ready</span>
+            <span>SQLite 3.x WASM</span>
           </span>
           <span id="sb-db-info">Database: Ready</span>
           <span id="sb-encoding">Encoding: UTF-8</span>
         </div>
 
         <div class="statusbar-right">
-          <span>🔒 100% In-Memory (Zero Telemetry)</span>
+          <span>🔒 100% Local In-Memory</span>
           <span id="sb-perf-time">Latency: 0.2ms</span>
-          <span>v1.2.0-pro</span>
+          <span>SQLiteLens Studio v2.0</span>
         </div>
       </footer>
 
@@ -533,7 +729,9 @@
 
   </div>
 
-  <!-- Command Palette Modal (Ctrl+K) -->
+  <!-- =========================================================================
+       MODAL 1: COMMAND PALETTE (Ctrl+K / ⌘K)
+       ========================================================================= -->
   <div id="palette-overlay" class="palette-overlay">
     <div class="palette-box">
       <div class="palette-input-wrap">
@@ -541,26 +739,85 @@
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        <input type="text" id="palette-search-input" class="palette-input" placeholder="Type a table name or command...">
+        <input type="text" id="palette-search-input" class="palette-input" placeholder="Search tables, run SQL commands, export data...">
         <span class="kbd-shortcut">ESC</span>
       </div>
       <ul class="palette-results" id="palette-results-list"></ul>
     </div>
   </div>
 
-  <!-- Cell Inspection Modal -->
+  <!-- =========================================================================
+       MODAL 2: CELL INSPECTOR & LIVE EDITOR
+       ========================================================================= -->
   <div id="modal-cell-inspector" class="modal-overlay">
     <div class="modal-dialog">
       <div class="modal-head">
-        <span id="modal-inspector-title">Cell Inspector</span>
+        <div>
+          <div id="modal-inspector-title" style="font-weight: 700;">Cell Inspector</div>
+          <div id="modal-inspector-subtitle" style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px;"></div>
+        </div>
         <button id="btn-close-inspector" class="btn btn-ghost btn-sm">✕</button>
       </div>
       <div class="modal-body">
-        <pre id="modal-inspector-body" style="font-family: var(--font-mono); font-size: 0.85rem; white-space: pre-wrap; word-break: break-all; color: var(--text-primary);"></pre>
+        <textarea id="modal-inspector-editor" class="inspector-textarea" spellcheck="false"></textarea>
+      </div>
+      <div class="modal-foot" style="justify-content: space-between;">
+        <div style="display: flex; gap: 6px;">
+          <button id="btn-inspector-set-null" class="btn btn-secondary btn-sm" title="Set cell value to SQL NULL">Set NULL</button>
+          <button id="btn-inspector-format-json" class="btn btn-secondary btn-sm" title="Prettify JSON">Format JSON</button>
+          <button id="btn-inspector-delete-row" class="btn btn-danger btn-sm" title="Delete this entire row">Delete Row</button>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button id="btn-copy-inspector" class="btn btn-secondary btn-sm">Copy</button>
+          <button id="btn-done-inspector" class="btn btn-ghost btn-sm">Cancel</button>
+          <button id="btn-save-inspector" class="btn btn-primary btn-sm">Save Value</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 3: INSERT NEW ROW
+       ========================================================================= -->
+  <div id="modal-insert-row" class="modal-overlay">
+    <div class="modal-dialog">
+      <div class="modal-head">
+        <span id="modal-insert-title">Insert Row</span>
+        <button id="btn-close-insert" class="btn btn-ghost btn-sm">✕</button>
+      </div>
+      <div class="modal-body" id="modal-insert-fields" style="display: flex; flex-direction: column; gap: 12px;"></div>
+      <div class="modal-foot">
+        <button id="btn-cancel-insert" class="btn btn-ghost btn-sm">Cancel</button>
+        <button id="btn-confirm-insert" class="btn btn-primary btn-sm">Insert Record</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 4: CREATE NEW TABLE WIZARD
+       ========================================================================= -->
+  <div id="modal-create-table" class="modal-overlay">
+    <div class="modal-dialog" style="max-width: 680px;">
+      <div class="modal-head">
+        <span>Create New SQLite Table</span>
+        <button id="btn-close-create-table" class="btn btn-ghost btn-sm">✕</button>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 5px;">TABLE NAME</label>
+          <input type="text" id="new-table-name-input" class="input-search" placeholder="e.g. customer_events" style="width: 100%;">
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">COLUMNS</label>
+            <button id="btn-add-col-row" class="btn btn-secondary btn-sm">+ Add Column</button>
+          </div>
+          <div id="new-table-cols-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
       </div>
       <div class="modal-foot">
-        <button id="btn-copy-inspector" class="btn btn-secondary btn-sm">Copy Value</button>
-        <button id="btn-done-inspector" class="btn btn-primary btn-sm">Done</button>
+        <button id="btn-cancel-create-table" class="btn btn-ghost btn-sm">Cancel</button>
+        <button id="btn-confirm-create-table" class="btn btn-primary btn-sm">Create Table</button>
       </div>
     </div>
   </div>
@@ -568,7 +825,7 @@
   <!-- Toast Notification Shelf -->
   <div id="toast-shelf" class="toast-shelf"></div>
 
-  <!-- Application Entry Script (relative path) -->
+  <!-- Application Entry Script -->
   <script type="module" src="./src/app.js"></script>
 </body>
 </html>

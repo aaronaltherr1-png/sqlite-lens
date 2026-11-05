@@ -1,7 +1,7 @@
 {
   "name": "sqlite-lens",
-  "version": "1.0.0",
-  "description": "The modern, privacy-first SQLite viewer and query studio that runs 100% in your browser.",
+  "version": "2.0.0",
+  "description": "Desktop-grade SQLite workbench and visual ERD studio running 100% in your browser via WebAssembly.",
   "type": "module",
   "scripts": {
     "dev": "vite",
